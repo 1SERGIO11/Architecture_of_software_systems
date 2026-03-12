@@ -1,0 +1,390 @@
+{
+  "base": "http://127.0.0.1:50477",
+  "results": [
+    {
+      "step": 1,
+      "method": "GET",
+      "path": "/api/v1/health",
+      "request_body": null,
+      "response": {
+        "status": 200,
+        "body": {
+          "status": "ok"
+        },
+        "headers": {
+          "Server": "BaseHTTP/0.6 Python/3.14.3",
+          "Date": "Tue, 10 Mar 2026 15:30:28 GMT",
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Length": "16"
+        }
+      }
+    },
+    {
+      "step": 2,
+      "method": "POST",
+      "path": "/api/v1/customers",
+      "request_body": {
+        "customer_id": "demo-c1",
+        "name": "Demo",
+        "email": "demo@example.com",
+        "push_token": "push-demo"
+      },
+      "response": {
+        "status": 201,
+        "body": {
+          "customer_id": "demo-c1",
+          "name": "Demo",
+          "email": "demo@example.com",
+          "push_token": "push-demo",
+          "push_enabled": true,
+          "email_enabled": true
+        },
+        "headers": {
+          "Server": "BaseHTTP/0.6 Python/3.14.3",
+          "Date": "Tue, 10 Mar 2026 15:30:28 GMT",
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Length": "143"
+        }
+      }
+    },
+    {
+      "step": 3,
+      "method": "POST",
+      "path": "/api/v1/customers",
+      "request_body": {
+        "customer_id": "demo-c1",
+        "name": "Demo"
+      },
+      "response": {
+        "status": 409,
+        "body": {
+          "error": "Клиент demo-c1 уже существует."
+        },
+        "headers": {
+          "Server": "BaseHTTP/0.6 Python/3.14.3",
+          "Date": "Tue, 10 Mar 2026 15:30:28 GMT",
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Length": "62"
+        }
+      }
+    },
+    {
+      "step": 4,
+      "method": "GET",
+      "path": "/api/v1/customers/demo-c1",
+      "request_body": null,
+      "response": {
+        "status": 200,
+        "body": {
+          "customer_id": "demo-c1",
+          "name": "Demo",
+          "email": "demo@example.com",
+          "push_token": "push-demo",
+          "push_enabled": true,
+          "email_enabled": true
+        },
+        "headers": {
+          "Server": "BaseHTTP/0.6 Python/3.14.3",
+          "Date": "Tue, 10 Mar 2026 15:30:28 GMT",
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Length": "143"
+        }
+      }
+    },
+    {
+      "step": 5,
+      "method": "GET",
+      "path": "/api/v1/customers/missing",
+      "request_body": null,
+      "response": {
+        "status": 404,
+        "body": {
+          "error": "Клиент missing не найден."
+        },
+        "headers": {
+          "Server": "BaseHTTP/0.6 Python/3.14.3",
+          "Date": "Tue, 10 Mar 2026 15:30:28 GMT",
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Length": "52"
+        }
+      }
+    },
+    {
+      "step": 6,
+      "method": "POST",
+      "path": "/api/v1/orders",
+      "request_body": {
+        "order_id": "demo-o1",
+        "customer_id": "demo-c1",
+        "store_id": "store-1",
+        "fulfillment": "pickup",
+        "total_amount": 320
+      },
+      "response": {
+        "status": 201,
+        "body": {
+          "order_id": "demo-o1",
+          "customer_id": "demo-c1",
+          "store_id": "store-1",
+          "fulfillment": "pickup",
+          "status": "placed",
+          "history": [
+            "placed"
+          ],
+          "total_amount": 320.0,
+          "updated_at": "2026-03-10T15:30:28.380218+00:00"
+        },
+        "headers": {
+          "Server": "BaseHTTP/0.6 Python/3.14.3",
+          "Date": "Tue, 10 Mar 2026 15:30:28 GMT",
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Length": "213"
+        }
+      }
+    },
+    {
+      "step": 7,
+      "method": "POST",
+      "path": "/api/v1/orders",
+      "request_body": {
+        "order_id": "demo-o2",
+        "customer_id": "missing",
+        "store_id": "store-1",
+        "fulfillment": "pickup",
+        "total_amount": 320
+      },
+      "response": {
+        "status": 400,
+        "body": {
+          "error": "Нельзя создать заказ: клиент missing не найден."
+        },
+        "headers": {
+          "Server": "BaseHTTP/0.6 Python/3.14.3",
+          "Date": "Tue, 10 Mar 2026 15:30:28 GMT",
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Length": "92"
+        }
+      }
+    },
+    {
+      "step": 8,
+      "method": "GET",
+      "path": "/api/v1/orders",
+      "request_body": null,
+      "response": {
+        "status": 200,
+        "body": {
+          "items": [
+            {
+              "order_id": "demo-o1",
+              "customer_id": "demo-c1",
+              "store_id": "store-1",
+              "fulfillment": "pickup",
+              "status": "placed",
+              "history": [
+                "placed"
+              ],
+              "total_amount": 320.0,
+              "updated_at": "2026-03-10T15:30:28.380218+00:00"
+            }
+          ]
+        },
+        "headers": {
+          "Server": "BaseHTTP/0.6 Python/3.14.3",
+          "Date": "Tue, 10 Mar 2026 15:30:28 GMT",
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Length": "226"
+        }
+      }
+    },
+    {
+      "step": 9,
+      "method": "GET",
+      "path": "/api/v1/orders/demo-o1",
+      "request_body": null,
+      "response": {
+        "status": 200,
+        "body": {
+          "order_id": "demo-o1",
+          "customer_id": "demo-c1",
+          "store_id": "store-1",
+          "fulfillment": "pickup",
+          "status": "placed",
+          "history": [
+            "placed"
+          ],
+          "total_amount": 320.0,
+          "updated_at": "2026-03-10T15:30:28.380218+00:00"
+        },
+        "headers": {
+          "Server": "BaseHTTP/0.6 Python/3.14.3",
+          "Date": "Tue, 10 Mar 2026 15:30:28 GMT",
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Length": "213"
+        }
+      }
+    },
+    {
+      "step": 10,
+      "method": "PUT",
+      "path": "/api/v1/orders/demo-o1",
+      "request_body": {
+        "total_amount": 410
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "order_id": "demo-o1",
+          "customer_id": "demo-c1",
+          "store_id": "store-1",
+          "fulfillment": "pickup",
+          "status": "placed",
+          "history": [
+            "placed"
+          ],
+          "total_amount": 410.0,
+          "updated_at": "2026-03-10T15:30:28.380218+00:00"
+        },
+        "headers": {
+          "Server": "BaseHTTP/0.6 Python/3.14.3",
+          "Date": "Tue, 10 Mar 2026 15:30:28 GMT",
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Length": "213"
+        }
+      }
+    },
+    {
+      "step": 11,
+      "method": "POST",
+      "path": "/api/v1/orders/demo-o1/status",
+      "request_body": {
+        "status": "in_preparation"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "order_id": "demo-o1",
+          "customer_id": "demo-c1",
+          "store_id": "store-1",
+          "fulfillment": "pickup",
+          "status": "in_preparation",
+          "history": [
+            "placed",
+            "in_preparation"
+          ],
+          "total_amount": 410.0,
+          "updated_at": "2026-03-10T15:30:28.381612+00:00"
+        },
+        "headers": {
+          "Server": "BaseHTTP/0.6 Python/3.14.3",
+          "Date": "Tue, 10 Mar 2026 15:30:28 GMT",
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Length": "239"
+        }
+      }
+    },
+    {
+      "step": 12,
+      "method": "POST",
+      "path": "/api/v1/orders/demo-o1/status",
+      "request_body": {
+        "status": "delivered"
+      },
+      "response": {
+        "status": 400,
+        "body": {
+          "error": "Нельзя перевести заказ demo-o1 из in_preparation в delivered."
+        },
+        "headers": {
+          "Server": "BaseHTTP/0.6 Python/3.14.3",
+          "Date": "Tue, 10 Mar 2026 15:30:28 GMT",
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Length": "97"
+        }
+      }
+    },
+    {
+      "step": 13,
+      "method": "GET",
+      "path": "/api/v1/orders/demo-o1/notifications",
+      "request_body": null,
+      "response": {
+        "status": 200,
+        "body": {
+          "items": [
+            {
+              "notification_id": "4c21bc41-82f8-49a2-bf3d-ca59136592b3",
+              "order_id": "demo-o1",
+              "channel": "push",
+              "recipient": "push-demo",
+              "message": "Заказ принят: заказ #demo-o1, статус placed.",
+              "created_at": "2026-03-10T15:30:28.380255+00:00"
+            },
+            {
+              "notification_id": "5b80bc37-5d45-4432-b316-9a4adb588fa8",
+              "order_id": "demo-o1",
+              "channel": "email",
+              "recipient": "demo@example.com",
+              "message": "Заказ принят: заказ #demo-o1, статус placed.",
+              "created_at": "2026-03-10T15:30:28.380265+00:00"
+            },
+            {
+              "notification_id": "194737ca-1b0a-4bbb-89d3-b87bc16fb9e7",
+              "order_id": "demo-o1",
+              "channel": "push",
+              "recipient": "push-demo",
+              "message": "Заказ готовится: заказ #demo-o1, статус in_preparation.",
+              "created_at": "2026-03-10T15:30:28.381627+00:00"
+            },
+            {
+              "notification_id": "fa459ffe-c159-4719-a728-87cffc0c6328",
+              "order_id": "demo-o1",
+              "channel": "email",
+              "recipient": "demo@example.com",
+              "message": "Заказ готовится: заказ #demo-o1, статус in_preparation.",
+              "created_at": "2026-03-10T15:30:28.381631+00:00"
+            }
+          ]
+        },
+        "headers": {
+          "Server": "BaseHTTP/0.6 Python/3.14.3",
+          "Date": "Tue, 10 Mar 2026 15:30:28 GMT",
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Length": "1095"
+        }
+      }
+    },
+    {
+      "step": 14,
+      "method": "DELETE",
+      "path": "/api/v1/orders/demo-o1",
+      "request_body": null,
+      "response": {
+        "status": 204,
+        "body": null,
+        "headers": {
+          "Server": "BaseHTTP/0.6 Python/3.14.3",
+          "Date": "Tue, 10 Mar 2026 15:30:28 GMT"
+        }
+      }
+    },
+    {
+      "step": 15,
+      "method": "DELETE",
+      "path": "/api/v1/orders/demo-o1",
+      "request_body": null,
+      "response": {
+        "status": 404,
+        "body": {
+          "error": "Заказ demo-o1 не найден."
+        },
+        "headers": {
+          "Server": "BaseHTTP/0.6 Python/3.14.3",
+          "Date": "Tue, 10 Mar 2026 15:30:28 GMT",
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Length": "50"
+        }
+      }
+    }
+  ]
+}

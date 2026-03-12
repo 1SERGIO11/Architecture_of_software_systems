@@ -1,0 +1,498 @@
+{
+  "info": {
+    "name": "LabWork4 REST API",
+    "_postman_id": "7bbf8fe1-c9e1-47eb-a3ac-0be65f1bb111",
+    "description": "Collection for Lab Work #4: REST API design and testing.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "01 GET /health - success",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/v1/health"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+              "const data = pm.response.json(); pm.test('Body status=ok', function () { pm.expect(data.status).to.eql('ok'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 GET /healthz - not found",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/v1/healthz"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 404', function () { pm.response.to.have.status(404); });",
+              "const data = pm.response.json(); pm.test('Error exists', function () { pm.expect(data.error).to.be.a('string'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 POST /customers - create",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/v1/customers",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"customer_id\": \"pm-customer-1\",\n  \"name\": \"Postman User\",\n  \"email\": \"postman@example.com\",\n  \"push_token\": \"push-postman\",\n  \"push_enabled\": true,\n  \"email_enabled\": true\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+              "const data = pm.response.json(); pm.test('customer_id saved', function () { pm.expect(data.customer_id).to.eql('pm-customer-1'); });",
+              "pm.collectionVariables.set('customerId', 'pm-customer-1');"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 POST /customers - duplicate conflict",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/v1/customers",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"customer_id\": \"pm-customer-1\",\n  \"name\": \"Duplicate\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 409', function () { pm.response.to.have.status(409); });",
+              "const data = pm.response.json(); pm.test('Error field exists', function () { pm.expect(data.error).to.be.a('string'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 GET /customers/{id} - success",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/v1/customers/{{customerId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+              "const data = pm.response.json(); pm.test('Name exists', function () { pm.expect(data.name).to.be.a('string'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 GET /customers/{id} - not found",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/v1/customers/unknown-customer"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 404', function () { pm.response.to.have.status(404); });",
+              "const data = pm.response.json(); pm.test('Error text exists', function () { pm.expect(data.error).to.be.a('string'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 POST /orders - create",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/v1/orders",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"order_id\": \"pm-order-1\",\n  \"customer_id\": \"{{customerId}}\",\n  \"store_id\": \"store-01\",\n  \"fulfillment\": \"pickup\",\n  \"total_amount\": 420.5\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+              "const data = pm.response.json(); pm.test('Order status placed', function () { pm.expect(data.status).to.eql('placed'); });",
+              "pm.collectionVariables.set('orderId', 'pm-order-1');"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 POST /orders - invalid customer",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/v1/orders",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"order_id\": \"pm-order-invalid\",\n  \"customer_id\": \"missing-customer\",\n  \"store_id\": \"store-01\",\n  \"fulfillment\": \"pickup\",\n  \"total_amount\": 100\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 400', function () { pm.response.to.have.status(400); });",
+              "const data = pm.response.json(); pm.test('Error text exists', function () { pm.expect(data.error).to.be.a('string'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 GET /orders - list",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/v1/orders"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+              "const data = pm.response.json(); pm.test('items is array', function () { pm.expect(data.items).to.be.an('array'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 GET /orders?status=cancelled - filtered list",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/v1/orders?status=cancelled"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+              "const data = pm.response.json(); pm.test('items is array', function () { pm.expect(data.items).to.be.an('array'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 GET /orders/{id} - success",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/v1/orders/{{orderId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+              "const data = pm.response.json(); pm.test('order id matches', function () { pm.expect(data.order_id).to.eql(pm.collectionVariables.get('orderId')); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "12 GET /orders/{id} - not found",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/v1/orders/unknown-order"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 404', function () { pm.response.to.have.status(404); });",
+              "const data = pm.response.json(); pm.test('Error field exists', function () { pm.expect(data.error).to.be.a('string'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "13 PUT /orders/{id} - update amount",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/v1/orders/{{orderId}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"total_amount\": 499.9\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+              "const data = pm.response.json(); pm.test('Amount updated', function () { pm.expect(data.total_amount).to.eql(499.9); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "14 PUT /orders/{id} - not found",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/v1/orders/unknown-order",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"total_amount\": 300\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 404', function () { pm.response.to.have.status(404); });",
+              "const data = pm.response.json(); pm.test('Error field exists', function () { pm.expect(data.error).to.be.a('string'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "15 POST /orders/{id}/status - valid transition",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/v1/orders/{{orderId}}/status",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"in_preparation\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+              "const data = pm.response.json(); pm.test('Status changed', function () { pm.expect(data.status).to.eql('in_preparation'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "16 POST /orders/{id}/status - invalid transition",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/v1/orders/{{orderId}}/status",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"delivered\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 400', function () { pm.response.to.have.status(400); });",
+              "const data = pm.response.json(); pm.test('Error field exists', function () { pm.expect(data.error).to.be.a('string'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "17 GET /orders/{id}/notifications - success",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/v1/orders/{{orderId}}/notifications"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+              "const data = pm.response.json(); pm.test('Notifications list not empty', function () { pm.expect(data.items.length).to.be.greaterThan(0); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "18 GET /orders/{id}/notifications - order not found",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/v1/orders/unknown-order/notifications"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 404', function () { pm.response.to.have.status(404); });",
+              "const data = pm.response.json(); pm.test('Error exists', function () { pm.expect(data.error).to.be.a('string'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "19 DELETE /orders/{id} - success",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/api/v1/orders/{{orderId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 204', function () { pm.response.to.have.status(204); });",
+              "pm.test('Empty body', function () { pm.expect(pm.response.text()).to.eql(''); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "20 DELETE /orders/{id} - not found",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/api/v1/orders/{{orderId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 404', function () { pm.response.to.have.status(404); });",
+              "const data = pm.response.json(); pm.test('Error exists', function () { pm.expect(data.error).to.be.a('string'); });"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8001"
+    },
+    {
+      "key": "customerId",
+      "value": "pm-customer-1"
+    },
+    {
+      "key": "orderId",
+      "value": "pm-order-1"
+    }
+  ]
+}
