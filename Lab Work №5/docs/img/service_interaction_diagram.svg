@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="860" viewBox="0 0 1440 860">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#0f172a"/>
+    </marker>
+    <style>
+      .bg { fill: #f8fafc; }
+      .title { font: 700 34px 'Segoe UI', Arial, sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 19px 'Segoe UI', Arial, sans-serif; fill: #334155; }
+      .network { fill: #e2e8f0; stroke: #94a3b8; stroke-width: 2; rx: 18; ry: 18; }
+      .network-title { font: 600 19px 'Segoe UI', Arial, sans-serif; fill: #334155; }
+      .card { fill: #ffffff; stroke: #334155; stroke-width: 2; rx: 14; ry: 14; }
+      .card-title { font: 700 24px 'Segoe UI', Arial, sans-serif; fill: #0f172a; }
+      .card-text { font: 500 16px 'Segoe UI', Arial, sans-serif; fill: #334155; }
+      .actor { fill: #fff7ed; stroke: #ea580c; stroke-width: 2; rx: 14; ry: 14; }
+      .actor-title { font: 700 22px 'Segoe UI', Arial, sans-serif; fill: #9a3412; }
+      .actor-text { font: 500 15px 'Segoe UI', Arial, sans-serif; fill: #9a3412; }
+      .flow { stroke: #0f172a; stroke-width: 2.4; fill: none; marker-end: url(#arrow); }
+      .flow-back { stroke: #0f172a; stroke-width: 2.4; fill: none; stroke-dasharray: 10 7; marker-end: url(#arrow); }
+      .label { font: 600 15px 'Segoe UI', Arial, sans-serif; fill: #1e293b; }
+      .legend-box { fill: #ffffff; stroke: #cbd5e1; stroke-width: 1.6; rx: 12; ry: 12; }
+      .legend-title { font: 700 17px 'Segoe UI', Arial, sans-serif; fill: #0f172a; }
+      .legend-text { font: 500 15px 'Segoe UI', Arial, sans-serif; fill: #334155; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1440" height="860"/>
+
+  <text class="title" x="44" y="58">Схема взаимодействия сервисов (ЛР5)</text>
+  <text class="subtitle" x="44" y="92">Система заказов: пользователь -> client (web UI) -> backend (REST API) -> PostgreSQL</text>
+
+  <rect class="network" x="230" y="145" width="1170" height="650"/>
+  <text class="network-title" x="258" y="180">Docker network: sandwich-net</text>
+
+  <rect class="actor" x="40" y="360" width="160" height="190"/>
+  <text class="actor-title" x="63" y="402">Пользователь</text>
+  <text class="actor-text" x="60" y="438">Браузер</text>
+  <text class="actor-text" x="60" y="464">http://127.0.0.1:8080</text>
+
+  <rect class="card" x="290" y="320" width="280" height="240"/>
+  <text class="card-title" x="325" y="362">client</text>
+  <text class="card-text" x="325" y="398">Nginx + Web UI</text>
+  <text class="card-text" x="325" y="424">HTML/CSS/JS</text>
+  <text class="card-text" x="325" y="450">Порт: 8080 -> 80</text>
+  <text class="card-text" x="325" y="476">Прокси: /api -> backend</text>
+
+  <rect class="card" x="680" y="320" width="320" height="240"/>
+  <text class="card-title" x="715" y="362">backend</text>
+  <text class="card-text" x="715" y="398">Python REST API</text>
+  <text class="card-text" x="715" y="424">http.server + psycopg</text>
+  <text class="card-text" x="715" y="450">Порт: 8001</text>
+  <text class="card-text" x="715" y="476">Endpoint: /api/v1/*</text>
+
+  <rect class="card" x="1080" y="320" width="260" height="240"/>
+  <text class="card-title" x="1118" y="362">db</text>
+  <text class="card-text" x="1118" y="398">PostgreSQL 16</text>
+  <text class="card-text" x="1118" y="424">Порт: 5432</text>
+  <text class="card-text" x="1118" y="450">БД: sandwich</text>
+  <text class="card-text" x="1118" y="476">Том: db_data</text>
+
+  <line class="flow" x1="200" y1="410" x2="290" y2="410"/>
+  <text class="label" x="210" y="392">HTTP :8080</text>
+
+  <line class="flow" x1="570" y1="395" x2="680" y2="395"/>
+  <text class="label" x="586" y="376">REST /api/v1</text>
+
+  <line class="flow-back" x1="680" y1="448" x2="570" y2="448"/>
+  <text class="label" x="585" y="470">JSON response</text>
+
+  <line class="flow" x1="1000" y1="395" x2="1080" y2="395"/>
+  <text class="label" x="1008" y="376">SQL/TCP :5432</text>
+
+  <line class="flow-back" x1="1080" y1="448" x2="1000" y2="448"/>
+  <text class="label" x="1008" y="470">Result set</text>
+
+  <rect class="legend-box" x="290" y="600" width="1050" height="170"/>
+  <text class="legend-title" x="320" y="632">Поток выполнения</text>
+  <text class="legend-text" x="320" y="665">1) Пользователь выполняет действие в web UI (браузер -> client).</text>
+  <text class="legend-text" x="320" y="695">2) Client отправляет REST-запрос в backend через прокси /api.</text>
+  <text class="legend-text" x="320" y="725">3) Backend применяет бизнес-логику и выполняет чтение/запись в PostgreSQL.</text>
+  <text class="legend-text" x="320" y="755">4) Результат обработки возвращается обратно в UI в JSON-формате.</text>
+</svg>
