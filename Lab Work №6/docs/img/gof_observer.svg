@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1060" height="320" viewBox="0 0 1060 320">
+
+<style>
+.bg { fill: #ffffff; }
+.frame { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 1.2; }
+.box { fill: #ffffff; stroke: #334155; stroke-width: 1.4; rx: 8; ry: 8; }
+.title { font: 600 15px 'Segoe UI', Arial, sans-serif; fill: #0f172a; }
+.meta { font: italic 12px 'Segoe UI', Arial, sans-serif; fill: #475569; }
+.text { font: 12px 'Consolas', 'Courier New', monospace; fill: #1e293b; }
+.small { font: 11px 'Segoe UI', Arial, sans-serif; fill: #334155; }
+.rel { stroke: #0f172a; stroke-width: 1.5; fill: none; }
+.rel-dashed { stroke: #0f172a; stroke-width: 1.5; fill: none; stroke-dasharray: 6 4; }
+</style>
+
+<defs>
+  <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#0f172a" />
+  </marker>
+  <marker id="triangle" viewBox="0 0 14 14" refX="12" refY="7" markerWidth="11" markerHeight="11" orient="auto-start-reverse">
+    <path d="M 1 1 L 12 7 L 1 13 z" fill="#ffffff" stroke="#0f172a" stroke-width="1.4" />
+  </marker>
+</defs>
+<rect class="bg" width="100%" height="100%"/>
+<rect class="frame" x="8" y="8" width="1044" height="304"/>
+<text class="title" x="22" y="32">Observer: Events and Notifications</text>
+<rect class="box" x="80" y="120" width="290" height="140" />
+<text class="title" x="90" y="144">OrderEventPublisher</text>
+<line class="rel" x1="80" y1="152" x2="370" y2="152"/>
+<text class="text" x="90" y="170">+ subscribe(observer)</text>
+<text class="text" x="90" y="186">+ publish(event)</text>
+<rect class="box" x="420" y="40" width="280" height="110" />
+<text class="meta" x="430" y="58">&lt;&lt;interface&gt;&gt;</text>
+<text class="title" x="430" y="78">OrderEventObserver</text>
+<line class="rel" x1="420" y1="86" x2="700" y2="86"/>
+<text class="text" x="430" y="104">+ update(event)</text>
+<rect class="box" x="730" y="120" width="250" height="130" />
+<text class="title" x="740" y="144">NotificationObserver</text>
+<line class="rel" x1="730" y1="152" x2="980" y2="152"/>
+<text class="text" x="740" y="170">+ sent: list[NotificationMessage]</text>
+<text class="text" x="740" y="186">+ update(event)</text>
+<line class="rel" x1="370" y1="185" x2="730" y2="185" marker-end="url(#arrow)"/>
+<text class="small" x="550.0" y="179.0">notifies</text>
+<line class="rel-dashed" x1="855" y1="120" x2="560" y2="150" marker-end="url(#triangle)"/>
+</svg>

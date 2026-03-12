@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1020" height="450" viewBox="0 0 1020 450">
+
+<style>
+.bg { fill: #ffffff; }
+.frame { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 1.2; }
+.box { fill: #ffffff; stroke: #334155; stroke-width: 1.4; rx: 8; ry: 8; }
+.title { font: 600 15px 'Segoe UI', Arial, sans-serif; fill: #0f172a; }
+.meta { font: italic 12px 'Segoe UI', Arial, sans-serif; fill: #475569; }
+.text { font: 12px 'Consolas', 'Courier New', monospace; fill: #1e293b; }
+.small { font: 11px 'Segoe UI', Arial, sans-serif; fill: #334155; }
+.rel { stroke: #0f172a; stroke-width: 1.5; fill: none; }
+.rel-dashed { stroke: #0f172a; stroke-width: 1.5; fill: none; stroke-dasharray: 6 4; }
+</style>
+
+<defs>
+  <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#0f172a" />
+  </marker>
+  <marker id="triangle" viewBox="0 0 14 14" refX="12" refY="7" markerWidth="11" markerHeight="11" orient="auto-start-reverse">
+    <path d="M 1 1 L 12 7 L 1 13 z" fill="#ffffff" stroke="#0f172a" stroke-width="1.4" />
+  </marker>
+</defs>
+<rect class="bg" width="100%" height="100%"/>
+<rect class="frame" x="8" y="8" width="1004" height="434"/>
+<text class="title" x="22" y="32">Adapter: Notification Channels</text>
+<rect class="box" x="390" y="35" width="260" height="110" />
+<text class="meta" x="400" y="53">&lt;&lt;interface&gt;&gt;</text>
+<text class="title" x="400" y="73">NotificationChannel</text>
+<line class="rel" x1="390" y1="81" x2="650" y2="81"/>
+<text class="text" x="400" y="99">+ send(recipient, message): str</text>
+<rect class="box" x="70" y="190" width="270" height="120" />
+<text class="title" x="80" y="214">EmailGatewayAdapter</text>
+<line class="rel" x1="70" y1="222" x2="340" y2="222"/>
+<text class="text" x="80" y="240">+ send(recipient, message): str</text>
+<rect class="box" x="390" y="190" width="260" height="120" />
+<text class="title" x="400" y="214">PushGatewayAdapter</text>
+<line class="rel" x1="390" y1="222" x2="650" y2="222"/>
+<text class="text" x="400" y="240">+ send(recipient, message): str</text>
+<rect class="box" x="700" y="180" width="240" height="100" />
+<text class="title" x="710" y="204">LegacyEmailGateway</text>
+<line class="rel" x1="700" y1="212" x2="940" y2="212"/>
+<text class="text" x="710" y="230">+ send_email(to, subject, body): str</text>
+<rect class="box" x="700" y="300" width="240" height="100" />
+<text class="title" x="710" y="324">LegacyPushGateway</text>
+<line class="rel" x1="700" y1="332" x2="940" y2="332"/>
+<text class="text" x="710" y="350">+ push(token, title, message): str</text>
+<line class="rel-dashed" x1="205" y1="190" x2="430" y2="145" marker-end="url(#triangle)"/>
+<line class="rel-dashed" x1="520" y1="190" x2="520" y2="145" marker-end="url(#triangle)"/>
+<line class="rel" x1="340" y1="245" x2="700" y2="230" marker-end="url(#arrow)"/>
+<text class="small" x="520.0" y="231.5">wraps</text>
+<line class="rel" x1="650" y1="250" x2="700" y2="350" marker-end="url(#arrow)"/>
+<text class="small" x="675.0" y="294.0">wraps</text>
+</svg>

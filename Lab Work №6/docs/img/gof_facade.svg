@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="470" viewBox="0 0 980 470">
+
+<style>
+.bg { fill: #ffffff; }
+.frame { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 1.2; }
+.box { fill: #ffffff; stroke: #334155; stroke-width: 1.4; rx: 8; ry: 8; }
+.title { font: 600 15px 'Segoe UI', Arial, sans-serif; fill: #0f172a; }
+.meta { font: italic 12px 'Segoe UI', Arial, sans-serif; fill: #475569; }
+.text { font: 12px 'Consolas', 'Courier New', monospace; fill: #1e293b; }
+.small { font: 11px 'Segoe UI', Arial, sans-serif; fill: #334155; }
+.rel { stroke: #0f172a; stroke-width: 1.5; fill: none; }
+.rel-dashed { stroke: #0f172a; stroke-width: 1.5; fill: none; stroke-dasharray: 6 4; }
+</style>
+
+<defs>
+  <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#0f172a" />
+  </marker>
+  <marker id="triangle" viewBox="0 0 14 14" refX="12" refY="7" markerWidth="11" markerHeight="11" orient="auto-start-reverse">
+    <path d="M 1 1 L 12 7 L 1 13 z" fill="#ffffff" stroke="#0f172a" stroke-width="1.4" />
+  </marker>
+</defs>
+<rect class="bg" width="100%" height="100%"/>
+<rect class="frame" x="8" y="8" width="964" height="454"/>
+<text class="title" x="22" y="32">Facade: OrderManagementFacade</text>
+<rect class="box" x="60" y="100" width="390" height="220" />
+<text class="title" x="70" y="124">OrderManagementFacade</text>
+<line class="rel" x1="60" y1="132" x2="450" y2="132"/>
+<text class="text" x="70" y="150">+ add_customer(customer)</text>
+<text class="text" x="70" y="166">+ list_customers()</text>
+<text class="text" x="70" y="182">+ create_order(builder)</text>
+<text class="text" x="70" y="198">+ change_order_status(order_id, status)</text>
+<rect class="box" x="560" y="35" width="320" height="85" />
+<text class="title" x="570" y="59">CustomerRepository</text>
+<line class="rel" x1="560" y1="67" x2="880" y2="67"/>
+<text class="text" x="570" y="85">&lt;&lt;interface&gt;&gt;</text>
+<rect class="box" x="560" y="135" width="320" height="85" />
+<text class="title" x="570" y="159">OrderRepository</text>
+<line class="rel" x1="560" y1="167" x2="880" y2="167"/>
+<text class="text" x="570" y="185">&lt;&lt;interface&gt;&gt;</text>
+<rect class="box" x="560" y="235" width="320" height="85" />
+<text class="title" x="570" y="259">OrderEventPublisher</text>
+<line class="rel" x1="560" y1="267" x2="880" y2="267"/>
+<text class="text" x="570" y="285">+ publish(event)</text>
+<rect class="box" x="560" y="335" width="320" height="85" />
+<text class="title" x="570" y="359">OrderStateMachine</text>
+<line class="rel" x1="560" y1="367" x2="880" y2="367"/>
+<text class="text" x="570" y="385">+ transition(order, status)</text>
+<line class="rel" x1="450" y1="130" x2="560" y2="78" marker-end="url(#arrow)"/>
+<line class="rel" x1="450" y1="170" x2="560" y2="178" marker-end="url(#arrow)"/>
+<line class="rel" x1="450" y1="220" x2="560" y2="278" marker-end="url(#arrow)"/>
+<line class="rel" x1="450" y1="270" x2="560" y2="378" marker-end="url(#arrow)"/>
+</svg>
