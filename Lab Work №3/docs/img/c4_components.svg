@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="930" viewBox="0 0 1500 930">
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .panel { fill: #ffffff; stroke: #cbd5e1; stroke-width: 1.8; rx: 14; }
+      .controller { fill: #ecfeff; stroke: #0284c7; stroke-width: 2.1; rx: 12; }
+      .service { fill: #eff6ff; stroke: #2563eb; stroke-width: 2.3; rx: 12; }
+      .domain { fill: #f0fdf4; stroke: #16a34a; stroke-width: 2.1; rx: 12; }
+      .adapter { fill: #fff7ed; stroke: #f97316; stroke-width: 2; rx: 12; }
+      .port { fill: #f5f3ff; stroke: #7c3aed; stroke-width: 2; rx: 12; }
+      .title { font: 700 28px Arial, sans-serif; fill: #111827; }
+      .subtitle { font: 500 16px Arial, sans-serif; fill: #374151; }
+      .box-title { font: 700 17px Arial, sans-serif; fill: #111827; }
+      .box-text { font: 500 13px Arial, sans-serif; fill: #1f2937; }
+      .group-title { font: 700 17px Arial, sans-serif; fill: #0f172a; }
+      .edge { stroke: #334155; stroke-width: 2.2; fill: none; marker-end: url(#arrow); }
+      .edge-label { font: 500 12px Arial, sans-serif; fill: #334155; }
+    </style>
+    <marker id="arrow" markerWidth="12" markerHeight="9" refX="11" refY="4.5" orient="auto">
+      <path d="M0,0 L12,4.5 L0,9 z" fill="#334155" />
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1500" height="930" class="bg"/>
+  <text x="36" y="52" class="title">Lab Work 3 - C4 Component Diagram</text>
+  <text x="36" y="80" class="subtitle">Container: Order Management API</text>
+
+  <rect x="28" y="106" width="1442" height="794" class="panel"/>
+  <text x="48" y="138" class="group-title">Order Management API internals</text>
+
+  <rect x="70" y="190" width="300" height="130" class="controller"/>
+  <text x="90" y="224" class="box-title">API Controller</text>
+  <text x="90" y="248" class="box-text">Parses HTTP requests</text>
+  <text x="90" y="270" class="box-text">Returns JSON response codes</text>
+
+  <rect x="430" y="180" width="340" height="180" class="service"/>
+  <text x="450" y="218" class="box-title">OrderStatusService</text>
+  <text x="450" y="242" class="box-text">Use-case orchestration</text>
+  <text x="450" y="264" class="box-text">Create order / update status</text>
+  <text x="450" y="286" class="box-text">Triggers notifications</text>
+
+  <rect x="840" y="180" width="280" height="130" class="domain"/>
+  <text x="860" y="214" class="box-title">Transition Rules</text>
+  <text x="860" y="238" class="box-text">Allowed status transitions</text>
+  <text x="860" y="260" class="box-text">Validation guard</text>
+
+  <rect x="1160" y="180" width="270" height="130" class="domain"/>
+  <text x="1180" y="214" class="box-title">Domain Models</text>
+  <text x="1180" y="238" class="box-text">Order, status, customer</text>
+  <text x="1180" y="260" class="box-text">Enums and entities</text>
+
+  <rect x="430" y="430" width="320" height="120" class="port"/>
+  <text x="450" y="462" class="box-title">OrderRepository (Port)</text>
+  <text x="450" y="486" class="box-text">add/get/save contract</text>
+
+  <rect x="810" y="430" width="320" height="120" class="adapter"/>
+  <text x="830" y="462" class="box-title">InMemoryOrderRepository</text>
+  <text x="830" y="486" class="box-text">Current storage adapter</text>
+
+  <rect x="430" y="620" width="320" height="120" class="port"/>
+  <text x="450" y="652" class="box-title">NotificationDispatcher (Port)</text>
+  <text x="450" y="676" class="box-text">dispatch_status_changed</text>
+
+  <rect x="810" y="620" width="320" height="120" class="adapter"/>
+  <text x="830" y="652" class="box-title">NotificationDispatcherImpl</text>
+  <text x="830" y="676" class="box-text">Selects channels and sends</text>
+
+  <rect x="1160" y="620" width="270" height="120" class="adapter"/>
+  <text x="1180" y="652" class="box-title">TemplateRenderer</text>
+  <text x="1180" y="676" class="box-text">Centralized message templates</text>
+
+  <path d="M370 255 L430 255" class="edge"/>
+  <text x="376" y="244" class="edge-label">calls</text>
+
+  <path d="M770 245 L840 245" class="edge"/>
+  <text x="784" y="234" class="edge-label">validates</text>
+
+  <path d="M770 280 L1160 245" class="edge"/>
+  <text x="935" y="250" class="edge-label">uses types</text>
+
+  <path d="M600 360 L590 430" class="edge"/>
+  <text x="606" y="400" class="edge-label">depends on</text>
+
+  <path d="M750 490 L810 490" class="edge"/>
+  <text x="760" y="478" class="edge-label">implemented by</text>
+
+  <path d="M600 360 L590 620" class="edge"/>
+  <text x="606" y="560" class="edge-label">depends on</text>
+
+  <path d="M750 680 L810 680" class="edge"/>
+  <text x="760" y="668" class="edge-label">implemented by</text>
+
+  <path d="M1130 680 L1160 680" class="edge"/>
+  <text x="1134" y="668" class="edge-label">uses</text>
+</svg>

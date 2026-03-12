@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1700" height="1080" viewBox="0 0 1700 1080">
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .title { font: 700 28px Arial, sans-serif; fill: #111827; }
+      .subtitle { font: 500 16px Arial, sans-serif; fill: #374151; }
+      .entity { fill: #ffffff; stroke: #475569; stroke-width: 1.8; rx: 10; }
+      .entity-head { fill: #e2e8f0; stroke: #475569; stroke-width: 1.6; rx: 10; }
+      .name { font: 700 15px Arial, sans-serif; fill: #0f172a; }
+      .attr { font: 500 12px Arial, sans-serif; fill: #1f2937; }
+      .rel { stroke: #1e293b; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .card { font: 600 11px Arial, sans-serif; fill: #334155; }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,0 L10,4 L0,8 z" fill="#1e293b"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1700" height="1080" class="bg"/>
+  <text x="34" y="52" class="title">Lab Work 3 - UML Class Diagram (Database Model)</text>
+  <text x="34" y="80" class="subtitle">8 entities for order, payment, delivery and notifications</text>
+
+  <g>
+    <rect x="70" y="140" width="300" height="190" class="entity"/>
+    <rect x="70" y="140" width="300" height="42" class="entity-head"/>
+    <text x="92" y="166" class="name">Customer</text>
+    <text x="92" y="202" class="attr">+ id: UUID</text>
+    <text x="92" y="222" class="attr">+ full_name: string</text>
+    <text x="92" y="242" class="attr">+ email: string</text>
+    <text x="92" y="262" class="attr">+ push_token: string</text>
+    <text x="92" y="282" class="attr">+ push_enabled: bool</text>
+    <text x="92" y="302" class="attr">+ email_enabled: bool</text>
+
+    <rect x="430" y="140" width="300" height="170" class="entity"/>
+    <rect x="430" y="140" width="300" height="42" class="entity-head"/>
+    <text x="452" y="166" class="name">Store</text>
+    <text x="452" y="202" class="attr">+ id: UUID</text>
+    <text x="452" y="222" class="attr">+ title: string</text>
+    <text x="452" y="242" class="attr">+ city: string</text>
+    <text x="452" y="262" class="attr">+ address: string</text>
+    <text x="452" y="282" class="attr">+ delivery_enabled: bool</text>
+
+    <rect x="790" y="140" width="300" height="170" class="entity"/>
+    <rect x="790" y="140" width="300" height="42" class="entity-head"/>
+    <text x="812" y="166" class="name">MenuItem</text>
+    <text x="812" y="202" class="attr">+ id: UUID</text>
+    <text x="812" y="222" class="attr">+ title: string</text>
+    <text x="812" y="242" class="attr">+ base_price: decimal</text>
+    <text x="812" y="262" class="attr">+ is_active: bool</text>
+
+    <rect x="430" y="400" width="360" height="230" class="entity"/>
+    <rect x="430" y="400" width="360" height="42" class="entity-head"/>
+    <text x="452" y="426" class="name">Order</text>
+    <text x="452" y="462" class="attr">+ id: UUID</text>
+    <text x="452" y="482" class="attr">+ customer_id: UUID</text>
+    <text x="452" y="502" class="attr">+ store_id: UUID</text>
+    <text x="452" y="522" class="attr">+ fulfillment: enum</text>
+    <text x="452" y="542" class="attr">+ current_status: enum</text>
+    <text x="452" y="562" class="attr">+ total_amount: decimal</text>
+    <text x="452" y="582" class="attr">+ created_at: datetime</text>
+    <text x="452" y="602" class="attr">+ updated_at: datetime</text>
+
+    <rect x="860" y="400" width="300" height="190" class="entity"/>
+    <rect x="860" y="400" width="300" height="42" class="entity-head"/>
+    <text x="882" y="426" class="name">OrderItem</text>
+    <text x="882" y="462" class="attr">+ id: UUID</text>
+    <text x="882" y="482" class="attr">+ order_id: UUID</text>
+    <text x="882" y="502" class="attr">+ menu_item_id: UUID</text>
+    <text x="882" y="522" class="attr">+ qty: int</text>
+    <text x="882" y="542" class="attr">+ unit_price: decimal</text>
+    <text x="882" y="562" class="attr">+ line_total: decimal</text>
+
+    <rect x="230" y="720" width="280" height="170" class="entity"/>
+    <rect x="230" y="720" width="280" height="42" class="entity-head"/>
+    <text x="252" y="746" class="name">Payment</text>
+    <text x="252" y="782" class="attr">+ id: UUID</text>
+    <text x="252" y="802" class="attr">+ order_id: UUID</text>
+    <text x="252" y="822" class="attr">+ method: enum</text>
+    <text x="252" y="842" class="attr">+ status: enum</text>
+    <text x="252" y="862" class="attr">+ amount: decimal</text>
+
+    <rect x="560" y="720" width="280" height="190" class="entity"/>
+    <rect x="560" y="720" width="280" height="42" class="entity-head"/>
+    <text x="582" y="746" class="name">DeliveryTask</text>
+    <text x="582" y="782" class="attr">+ id: UUID</text>
+    <text x="582" y="802" class="attr">+ order_id: UUID</text>
+    <text x="582" y="822" class="attr">+ courier_id: UUID</text>
+    <text x="582" y="842" class="attr">+ route_provider: string</text>
+    <text x="582" y="862" class="attr">+ eta_minutes: int</text>
+    <text x="582" y="882" class="attr">+ status: enum</text>
+
+    <rect x="890" y="720" width="320" height="190" class="entity"/>
+    <rect x="890" y="720" width="320" height="42" class="entity-head"/>
+    <text x="912" y="746" class="name">NotificationRecord</text>
+    <text x="912" y="782" class="attr">+ id: UUID</text>
+    <text x="912" y="802" class="attr">+ order_id: UUID</text>
+    <text x="912" y="822" class="attr">+ channel: enum</text>
+    <text x="912" y="842" class="attr">+ recipient: string</text>
+    <text x="912" y="862" class="attr">+ delivery_status: enum</text>
+    <text x="912" y="882" class="attr">+ created_at: datetime</text>
+
+    <path d="M370 236 L430 460" class="rel"/>
+    <text x="382" y="350" class="card">1 -> 0..*</text>
+
+    <path d="M580 310 L580 400" class="rel"/>
+    <text x="592" y="360" class="card">1 -> 0..*</text>
+
+    <path d="M790 500 L860 500" class="rel"/>
+    <text x="806" y="489" class="card">1 -> 1..*</text>
+
+    <path d="M940 310 L1010 400" class="rel"/>
+    <text x="948" y="360" class="card">1 -> 0..*</text>
+
+    <path d="M560 630 L370 720" class="rel"/>
+    <text x="444" y="684" class="card">1 -> 0..1</text>
+
+    <path d="M650 630 L700 720" class="rel"/>
+    <text x="676" y="684" class="card">1 -> 0..1</text>
+
+    <path d="M730 630 L1050 720" class="rel"/>
+    <text x="874" y="684" class="card">1 -> 0..*</text>
+  </g>
+</svg>
