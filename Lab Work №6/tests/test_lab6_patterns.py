@@ -9,9 +9,9 @@ SRC_ROOT = PROJECT_ROOT / "src"
 if str(SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(SRC_ROOT))
 
-from sandwich_lab6.behavioral import ChangeStatusCommand, CreateOrderCommand
+from sandwich_lab6.behavioral import ChangeStatusCommand, CommandBus, CreateOrderCommand
 from sandwich_lab6.bootstrap import build_context
-from sandwich_lab6.creational import AppConfig, OrderBuilder
+from sandwich_lab6.creational import AppConfig, EmailChannelCreator, OrderBuilder, PushChannelCreator
 from sandwich_lab6.domain import FulfillmentType, OrderStatus
 from sandwich_lab6.structural import CustomerRepositoryCacheProxy
 
@@ -26,6 +26,10 @@ class Lab6PatternsTestCase(unittest.TestCase):
         second = AppConfig()
         self.assertIs(first, second)
         self.assertEqual(first.delivery_fee, 89.0)
+
+    def test_builder_requires_required_fields(self) -> None:
+        with self.assertRaises(ValueError):
+            OrderBuilder().with_amount(200.0).build()
 
     def test_list_customers_and_proxy_cache(self) -> None:
         customers = self.facade.list_customers()
@@ -67,6 +71,7 @@ class Lab6PatternsTestCase(unittest.TestCase):
         )
         self.assertEqual(created.final_amount, 589.0)
         self.assertEqual(len(self.context.observer.sent), 1)  # only push for c-200
+        self.assertEqual(self.context.observer.sent[0].channel, "push")
 
     def test_state_transition_and_command(self) -> None:
         self.bus.execute(
@@ -115,6 +120,32 @@ class Lab6PatternsTestCase(unittest.TestCase):
         )
         self.assertGreaterEqual(len(self.context.audit_log), 2)
         self.assertTrue(self.context.audit_log[0].startswith("before:"))
+
+    def test_factory_method_creates_channels_with_unified_interface(self) -> None:
+        push_channel = PushChannelCreator().create_channel()
+        email_channel = EmailChannelCreator().create_channel()
+
+        self.assertEqual(push_channel.channel_name, "push")
+        self.assertEqual(email_channel.channel_name, "email")
+        self.assertIn("legacy-push:", push_channel.send("push-1", "hello"))
+        self.assertIn("legacy-email:", email_channel.send("user@example.com", "hello"))
+
+    def test_command_bus_calls_after_execute_hook(self) -> None:
+        executed: list[str] = []
+        bus = CommandBus(after_execute=lambda command: executed.append(type(command).__name__))
+        bus.execute(
+            CreateOrderCommand(
+                self.facade,
+                OrderBuilder()
+                .with_order_id("o-606")
+                .with_customer_id("c-100")
+                .with_store_id("store-1")
+                .with_fulfillment(FulfillmentType.PICKUP)
+                .with_amount(200.0),
+            )
+        )
+
+        self.assertEqual(executed, ["CreateOrderCommand"])
 
 
 if __name__ == "__main__":

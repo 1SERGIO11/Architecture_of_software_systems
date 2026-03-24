@@ -1,407 +1,258 @@
 # Лабораторная работа №6
 
 **Тема:** Использование шаблонов проектирования  
-**Цель работы:** Получить опыт применения шаблонов проектирования при написании кода программной системы.
+**Цель работы:** Показать применение шаблонов GoF и принципов GRASP в коде предметной области системы заказов и уведомлений.
 
-## Контекст реализуемой системы
+## Постановка задачи
 
-В качестве основы использована предметная область предыдущих лабораторных работ: система управления заказами и уведомлениями `sandwich app`.  
-Для ЛР6 реализован отдельный модуль `src/sandwich_lab6`, в котором жизненный цикл заказа (создание, расчет суммы, смена статуса, уведомления) организован через GoF-паттерны и проанализирован через GRASP.
+В работе используется предметная область предыдущих лабораторных: оформление заказа, расчет итоговой суммы, смена статуса и отправка уведомлений клиенту.  
+Для ЛР6 реализован отдельный учебный модуль `src/sandwich_lab6`, в котором один сквозной сценарий разложен на набор паттернов проектирования.
 
-## Шаблоны проектирования GoF
+Требуемый результат:
+- реализовать набор шаблонов GoF в реальном коде, а не в изолированных примерах;
+- показать роли классов по GRASP;
+- подтвердить работу кода демонстрационным сценарием и автотестами.
 
-## Порождающие шаблоны
+## Контекст реализации
 
-### 1) Singleton — `AppConfig`
+Модуль состоит из следующих частей:
 
-- Общее назначение: гарантировать единственный экземпляр объекта конфигурации.
-- Назначение в проекте: единый источник параметров расчета (`delivery_fee`, `currency`) для всех сценариев создания заказа.
+| Модуль | Назначение |
+| --- | --- |
+| `domain.py` | Доменные сущности заказа, клиента, события и уведомления |
+| `ports.py` | Абстракции репозиториев и канала уведомлений |
+| `creational.py` | Порождающие паттерны: `Singleton`, `Builder`, `Factory Method` |
+| `structural.py` | Структурные паттерны: `Adapter`, `Decorator`, `Proxy` |
+| `behavioral.py` | Поведенческие паттерны: `Strategy`, `Observer`, `State`, `Command`, `Chain of Responsibility` |
+| `facade.py` | Фасад прикладного сценария жизненного цикла заказа |
+| `bootstrap.py` | Сборка объектов и связей между ними |
+| `demo.py` | Демонстрационный запуск сквозного сценария |
 
-UML:
+## Сквозной сценарий
 
-![UML Diagram](img/gof_singleton.svg)
+В коде реализован один цельный поток работы:
 
-Фрагмент кода:
+1. `build_context()` собирает конфигурацию, репозитории, publisher, observer, фасад и командную шину.
+2. `CreateOrderCommand` передает в фасад `OrderBuilder`, который пошагово собирает `Order`.
+3. `OrderManagementFacade.create_order()` валидирует заказ через цепочку обработчиков.
+4. В зависимости от `pickup` или `delivery` выбирается стратегия расчета итоговой суммы.
+5. После сохранения заказа `OrderEventPublisher` публикует событие, а `NotificationObserver` отправляет уведомления через адаптеры каналов.
+6. `ChangeStatusCommand` изменяет статус заказа через `OrderStateMachine`, после чего снова публикуется событие и формируются уведомления.
 
-```python
-class AppConfig:
-    _instance: AppConfig | None = None
+Именно вокруг этого сценария и используются все заявленные паттерны.
 
-    def __new__(cls) -> AppConfig:
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-            cls._instance.delivery_fee = 89.0
-        return cls._instance
-```
+## Шаблоны GoF
 
-### 2) Builder — `OrderBuilder`
+### Порождающие шаблоны
 
-- Общее назначение: пошаговая сборка сложного объекта.
-- Назначение в проекте: безопасное создание `Order` с цепочкой методов (`with_order_id`, `with_customer_id`, `with_amount`, ...), без перегруженного конструктора.
+| Шаблон | Что означает | Где реализован | Как используется в работе |
+| --- | --- | --- | --- |
+| `Singleton` | Гарантирует единственный экземпляр объекта | `AppConfig` в `creational.py` | Все сценарии используют один объект конфигурации с `delivery_fee` и `currency` |
+| `Builder` | Собирает сложный объект пошагово | `OrderBuilder` в `creational.py` | Заказ создается через цепочку `with_order_id()`, `with_customer_id()`, `with_store_id()`, `with_amount()` |
+| `Factory Method` | Делегирует создание конкретного объекта подклассам | `NotificationChannelCreator`, `EmailChannelCreator`, `PushChannelCreator` | Подсистема уведомлений создает каналы `email` и `push` без ветвления в фасаде и observer |
 
-UML:
+#### `Singleton`
 
-![UML Diagram](img/gof_builder.svg)
+![Singleton](img/gof_singleton.svg)
 
-Фрагмент кода:
+`AppConfig` хранит общие параметры прикладного сценария.  
+В ЛР6 singleton нужен не формально, а для одного общего источника настроек, откуда фасад берет стоимость доставки.
 
-```python
-order = (
-    OrderBuilder()
-    .with_order_id("o-601")
-    .with_customer_id("c-100")
-    .with_store_id("store-1")
-    .with_fulfillment(FulfillmentType.PICKUP)
-    .with_amount(500.0)
-    .build()
-)
-```
+#### `Builder`
 
-### 3) Factory Method — `NotificationChannelCreator`
+![Builder](img/gof_builder.svg)
 
-- Общее назначение: делегировать создание объектов подклассам.
-- Назначение в проекте: независимое создание разных каналов уведомлений (`push`, `email`) без изменения бизнес-логики.
+`OrderBuilder` собирает заказ по шагам и не позволяет создать объект без обязательных полей.  
+Это подтверждается и кодом, и тестом `test_builder_requires_required_fields`.
 
-UML:
+#### `Factory Method`
 
-![UML Diagram](img/gof_factory_method.svg)
+![Factory Method](img/gof_factory_method.svg)
 
-Фрагмент кода:
+Фабричный метод используется для выбора конкретного канала уведомления.  
+Observer получает список creators и работает с ними единообразно, не зная деталей `EmailGatewayAdapter` и `PushGatewayAdapter`.
 
-```python
-class EmailChannelCreator(NotificationChannelCreator):
-    def create_channel(self) -> NotificationChannel:
-        return EmailGatewayAdapter(LegacyEmailGateway())
-```
+### Структурные шаблоны
 
-## Структурные шаблоны
+| Шаблон | Что означает | Где реализован | Как используется в работе |
+| --- | --- | --- | --- |
+| `Adapter` | Приводит несовместимый интерфейс к нужному контракту | `EmailGatewayAdapter`, `PushGatewayAdapter` в `structural.py` | Legacy SDK каналов приводятся к общему интерфейсу `send(recipient, message)` |
+| `Decorator` | Добавляет поведение объекту без изменения его класса | `AuditNotificationDecorator` в `structural.py` | Перед и после отправки уведомления в аудит пишутся записи `before/after` |
+| `Proxy` | Контролирует доступ к другому объекту | `CustomerRepositoryCacheProxy` в `structural.py` | Кэширует клиентов и считает `cache_hits` |
+| `Facade` | Дает один упрощенный интерфейс к набору подсистем | `OrderManagementFacade` в `facade.py` | Через фасад выполняются все прикладные операции: создание заказа, смена статуса, просмотр клиентов и заказов |
 
-### 4) Adapter — `EmailGatewayAdapter`, `PushGatewayAdapter`
+#### `Adapter`
 
-- Общее назначение: привести несовместимые интерфейсы к целевому контракту.
-- Назначение в проекте: интеграция legacy SDK с единым интерфейсом `NotificationChannel.send(recipient, message)`.
+![Adapter](img/gof_adapter.svg)
 
-UML:
+Адаптеры нужны потому, что legacy email и push gateway имеют разные сигнатуры вызова.  
+После адаптации observer и decorator работают с ними через один и тот же контракт.
 
-![UML Diagram](img/gof_adapter.svg)
+#### `Decorator`
 
-Фрагмент кода:
+![Decorator](img/gof_decorator.svg)
 
-```python
-class PushGatewayAdapter:
-    channel_name = "push"
+`AuditNotificationDecorator` оборачивает любой канал уведомлений и добавляет аудит.  
+Сам канал при этом не меняется, а дополнительное поведение подключается поверх него.
 
-    def send(self, recipient: str, message: str) -> str:
-        return self._gateway.push(token=recipient, title="Sandwich App", message=message)
-```
+#### `Proxy`
 
-### 5) Decorator — `AuditNotificationDecorator`
+![Proxy](img/gof_proxy.svg)
 
-- Общее назначение: динамически расширять поведение объекта без изменения класса.
-- Назначение в проекте: журналирование вызовов отправки уведомлений до и после реальной отправки.
+`CustomerRepositoryCacheProxy` стоит перед репозиторием клиентов и сохраняет уже прочитанные записи в локальном кеше.  
+Это видно в тесте `test_list_customers_and_proxy_cache`, где повторный запрос дает рост `cache_hits`.
 
-UML:
+#### `Facade`
 
-![UML Diagram](img/gof_decorator.svg)
+![Facade](img/gof_facade.svg)
 
-Фрагмент кода:
+`OrderManagementFacade` объединяет репозитории, state machine, publisher и стратегии расчета.  
+Именно этот объект выступает основной точкой входа в прикладной сценарий.
 
-```python
-class AuditNotificationDecorator(NotificationChannelDecorator):
-    def send(self, recipient: str, message: str) -> str:
-        self._audit_log.append(f"before:{self.channel_name}:{recipient}")
-        result = super().send(recipient, message)
-        self._audit_log.append(f"after:{self.channel_name}:{recipient}")
-        return result
-```
+### Поведенческие шаблоны
 
-### 6) Proxy — `CustomerRepositoryCacheProxy`
+| Шаблон | Что означает | Где реализован | Как используется в работе |
+| --- | --- | --- | --- |
+| `Strategy` | Позволяет менять алгоритм через взаимозаменяемые реализации | `PickupPricingStrategy`, `DeliveryPricingStrategy` | Итоговая сумма зависит от типа получения заказа |
+| `Observer` | Подписчики получают уведомление о событии издателя | `OrderEventPublisher`, `NotificationObserver` | После создания заказа и смены статуса автоматически рассылаются уведомления |
+| `State` | Поведение зависит от текущего состояния объекта | `OrderStateMachine` и классы состояний | Разрешенные переходы статусов определяются текущим состоянием заказа |
+| `Command` | Запрос представляется отдельным объектом | `CreateOrderCommand`, `ChangeStatusCommand`, `CommandBus` | Создание заказа и смена статуса выполняются единообразно через командную шину |
+| `Chain of Responsibility` | Запрос проходит по цепочке обработчиков | `CustomerExistsValidator`, `PositiveAmountValidator`, `StatusTransitionValidator` | Проверки заказа разбиты на независимые валидаторы |
 
-- Общее назначение: контролировать доступ к целевому объекту.
-- Назначение в проекте: кэширование обращений к репозиторию клиентов и сбор метрики `cache_hits`.
+#### `Strategy`
 
-UML:
+![Strategy](img/gof_strategy.svg)
 
-![UML Diagram](img/gof_proxy.svg)
+Стратегии расчета цены нужны для двух вариантов выдачи заказа:
+- `PickupPricingStrategy` оставляет сумму без изменений;
+- `DeliveryPricingStrategy` добавляет `delivery_fee` из `AppConfig`.
 
-Фрагмент кода:
+Тест `test_delivery_order_uses_delivery_strategy` подтверждает, что для доставки сумма меняется.
 
-```python
-def get(self, customer_id: str) -> Customer | None:
-    if customer_id in self._cache:
-        self.cache_hits += 1
-        return self._cache[customer_id]
-    customer = self._origin.get(customer_id)
-```
+#### `Observer`
 
-### 7) Facade — `OrderManagementFacade`
+![Observer](img/gof_observer.svg)
 
-- Общее назначение: предоставить единый упрощенный интерфейс к набору подсистем.
-- Назначение в проекте: одна точка входа для операций `create_order`, `change_order_status`, `list_customers`, `list_orders`.
+Publisher сообщает о событиях заказа, а `NotificationObserver` реагирует на них и создает сообщения по доступным каналам.  
+В результате отправка уведомлений не встраивается прямо в фасад и отделена от основного сценария.
 
-UML:
+#### `State`
 
-![UML Diagram](img/gof_facade.svg)
+![State](img/gof_state.svg)
 
-Фрагмент кода:
+`OrderStateMachine` хранит набор объектов-состояний и спрашивает у них допустимые переходы.  
+Для `pickup` и `delivery` правила различаются, что и делает использование состояния здесь оправданным.
 
-```python
-def create_order(self, builder: OrderBuilder) -> Order:
-    order = builder.build()
-    validation = CustomerExistsValidator(self._customer_repo)
-    validation.set_next(PositiveAmountValidator())
-    validation.handle(ValidationContext(order=order))
-    order.final_amount = self._pricing[order.fulfillment].calculate(order.base_amount)
-    self._order_repo.save(order)
-```
+#### `Command`
 
-## Поведенческие шаблоны
+![Command](img/gof_command.svg)
 
-### 8) Strategy — `PricingStrategy`
+Команды инкапсулируют операции `создать заказ` и `сменить статус`.  
+`CommandBus` выполняет команды единообразно и поддерживает hook `after_execute`, что проверяется тестом `test_command_bus_calls_after_execute_hook`.
 
-- Общее назначение: инкапсулировать взаимозаменяемые алгоритмы.
-- Назначение в проекте: выбор алгоритма расчета итоговой суммы по типу получения (`pickup`, `delivery`).
+#### `Chain of Responsibility`
 
-UML:
+![Chain of Responsibility](img/gof_chain.svg)
 
-![UML Diagram](img/gof_strategy.svg)
+При создании и изменении заказа проверки не смешаны в одном большом методе.  
+Каждая проверка вынесена в отдельный validator, а цепочка собирается фасадом под нужный сценарий.
 
-Фрагмент кода:
+## Применение GRASP
 
-```python
-self._pricing = {
-    FulfillmentType.PICKUP: PickupPricingStrategy(),
-    FulfillmentType.DELIVERY: DeliveryPricingStrategy(config.delivery_fee),
-}
-```
+### Роли классов
 
-### 9) Observer — `OrderEventPublisher`, `NotificationObserver`
+| Роль | Что означает | Пример в коде | Как проявляется в ЛР6 |
+| --- | --- | --- | --- |
+| `Information Expert` | Ответственность получает тот объект, который владеет нужными данными и правилами | `OrderStateMachine`, `OrderState` | Правила переходов статусов сосредоточены рядом с состояниями заказа |
+| `Creator` | Создавать объект должен тот, кто обладает всей нужной информацией для его сборки | `OrderBuilder` | Builder собирает `Order`, потому что хранит все части будущего объекта |
+| `Controller` | Один объект принимает системные команды и запускает сценарий | `OrderManagementFacade` | Фасад принимает команды прикладного уровня и координирует остальные объекты |
+| `Polymorphism` | Разные варианты поведения оформляются разными реализациями, а не `if/else` везде | `PricingStrategy`, `OrderState` | Расчет суммы и правила переходов меняются через полиморфные классы |
+| `Pure Fabrication` | Техническая обязанность выносится в отдельный сервисный класс, чтобы не засорять доменную модель | `EmailGatewayAdapter`, `PushGatewayAdapter`, `NotificationObserver` | Интеграция каналов и рассылка не помещены внутрь `Order` и `Customer` |
 
-- Общее назначение: оповещать подписчиков об изменении состояния издателя.
-- Назначение в проекте: реакция подсистемы уведомлений на события заказа (`создан`, `изменен статус`).
+### Принципы разработки
 
-UML:
+| Принцип | Что означает | Пример в коде | Результат |
+| --- | --- | --- | --- |
+| `Low Coupling` | Компоненты должны зависеть друг от друга как можно слабее | `CustomerRepository`, `OrderRepository`, `NotificationChannel` в `ports.py` | Фасад и observer работают через абстракции, а конкретные реализации можно заменить |
+| `High Cohesion` | У класса должна быть одна понятная группа обязанностей | отдельные классы для `Strategy`, `State`, `Validator`, `Adapter` | Логика расчета, переходов, валидации и интеграции не смешана в одном месте |
+| `Protected Variations` | Потенциально изменяемые части нужно изолировать за стабильным интерфейсом | creators каналов, стратегии цены, интерфейс observer | Добавление нового канала, новой стратегии или нового observer не требует переписывать весь сценарий |
 
-![UML Diagram](img/gof_observer.svg)
-
-Фрагмент кода:
-
-```python
-publisher.subscribe(observer)
-publisher.publish(OrderEvent(...))
-```
-
-### 10) State — `OrderStateMachine` + состояния
-
-- Общее назначение: изменять поведение объекта в зависимости от текущего состояния.
-- Назначение в проекте: управление допустимыми переходами статусов заказа с учетом `pickup/delivery`.
-
-UML:
-
-![UML Diagram](img/gof_state.svg)
-
-Фрагмент кода:
-
-```python
-def transition(self, order: Order, target: OrderStatus) -> None:
-    if not self.can_transition(order, target):
-        raise ValueError(...)
-    order.set_status(target)
-```
-
-### 11) Command — `CreateOrderCommand`, `ChangeStatusCommand`, `CommandBus`
-
-- Общее назначение: инкапсулировать запрос как объект.
-- Назначение в проекте: унифицированный запуск бизнес-операций и возможность журналирования/расширения через `CommandBus`.
-
-UML:
-
-![UML Diagram](img/gof_command.svg)
-
-Фрагмент кода:
-
-```python
-created = bus.execute(CreateOrderCommand(facade, builder))
-updated = bus.execute(ChangeStatusCommand(facade, "o-603", OrderStatus.IN_PREPARATION))
-```
-
-### 12) Chain of Responsibility — валидация заказа
-
-- Общее назначение: передавать запрос по цепочке обработчиков.
-- Назначение в проекте: независимые проверки при создании/изменении заказа (`CustomerExistsValidator`, `PositiveAmountValidator`, `StatusTransitionValidator`).
-
-UML:
-
-![UML Diagram](img/gof_chain.svg)
-
-Фрагмент кода:
-
-```python
-validation = CustomerExistsValidator(self._customer_repo)
-validation.set_next(PositiveAmountValidator())
-validation.handle(ValidationContext(order=order))
-```
-
-## Шаблоны проектирования GRASP
-
-## Роли (обязанности) классов
-
-### 1) Information Expert
-
-- Проблема: кто должен знать корректные переходы статусов заказа.
-- Решение: `OrderStateMachine` и состояния (`PlacedState`, `ReadyForPickupState`, ...) содержат правила переходов.
-- Пример кода:
-
-```python
-if not self.can_transition(order, target):
-    raise ValueError(...)
-```
-
-- Результат: правила сосредоточены в одном месте, а не размазаны по сервисам.
-- Связь с паттернами: State, Chain of Responsibility.
-
-### 2) Creator
-
-- Проблема: кто должен создавать объект `Order`.
-- Решение: `OrderBuilder` отвечает за конструирование заказа.
-- Пример кода:
-
-```python
-OrderBuilder().with_order_id(...).with_customer_id(...).build()
-```
-
-- Результат: создание объекта стало контролируемым и читаемым.
-- Связь с паттернами: Builder.
-
-### 3) Controller
-
-- Проблема: какой объект принимает системные команды сценария.
-- Решение: `OrderManagementFacade` выступает контроллером прикладного слоя.
-- Пример кода:
-
-```python
-facade.create_order(builder)
-facade.change_order_status(order_id, status)
-```
-
-- Результат: единая точка входа в use-case, прозрачная оркестрация.
-- Связь с паттернами: Facade, Command.
-
-### 4) Polymorphism
-
-- Проблема: как убрать `if/else`-ветвления для вариантов поведения.
-- Решение: разные реализации `PricingStrategy` и `OrderState`.
-- Пример кода:
-
-```python
-order.final_amount = self._pricing[order.fulfillment].calculate(order.base_amount)
-```
-
-- Результат: расширяемость без переписывания существующего кода.
-- Связь с паттернами: Strategy, State.
-
-### 5) Pure Fabrication
-
-- Проблема: доменные сущности не должны зависеть от инфраструктурных SDK.
-- Решение: адаптеры и наблюдатели выделены в отдельные сервисные классы (`EmailGatewayAdapter`, `NotificationObserver`).
-- Пример кода:
-
-```python
-channel = creator.create_audited_channel(self._audit_log)
-channel.send(recipient, event.text)
-```
-
-- Результат: доменная модель остается чистой.
-- Связь с паттернами: Adapter, Observer, Factory Method.
-
-## Принципы разработки
-
-### 1) Low Coupling
-
-- Проблема: сильные зависимости между слоями усложняют изменения.
-- Решение: использование абстракций `CustomerRepository`, `OrderRepository`, `NotificationChannel`.
-- Пример кода:
-
-```python
-def __init__(self, customer_repo: CustomerRepository, order_repo: OrderRepository, ...):
-    ...
-```
-
-- Результат: можно менять реализации хранилища и каналов независимо.
-- Связь с паттернами: Proxy, Adapter, Facade.
-
-### 2) High Cohesion
-
-- Проблема: смешение обязанностей внутри одного класса.
-- Решение: отдельные классы для валидации, расчета, смены статусов, отправки уведомлений.
-- Пример кода:
-
-```python
-class StatusTransitionValidator(ValidationHandler):
-    ...
-```
-
-- Результат: классы короткие, целевые и проще в тестировании.
-- Связь с паттернами: Chain of Responsibility, Strategy, State.
-
-### 3) Protected Variations
-
-- Проблема: внешние изменения (новый канал/новая стратегия) не должны ломать ядро.
-- Решение: точки расширения вынесены в полиморфные интерфейсы.
-- Пример кода:
-
-```python
-class NotificationChannelCreator(ABC):
-    @abstractmethod
-    def create_channel(self) -> NotificationChannel:
-        ...
-```
-
-- Результат: добавление нового канала не требует изменения `OrderManagementFacade`.
-- Связь с паттернами: Factory Method, Strategy, Observer.
-
-## Свойство программы (цель)
+## Свойство программы
 
 ### Расширяемость
 
-- Проблема: система должна развиваться без каскадного рефакторинга.
-- Решение: комбинация GoF-паттернов с GRASP-принципами (Facade + Strategy + Factory Method + Observer + Low Coupling).
-- Пример кода:
+Расширяемость здесь является не абстрактной целью, а прямым следствием выбранной архитектуры.
 
-```python
-observer = NotificationObserver(customer_repo, [PushChannelCreator(), EmailChannelCreator()], audit_log)
-publisher.subscribe(observer)
-```
-
-- Результат: можно добавить новый канал, новый алгоритм цены, новый обработчик валидации или новую команду локально.
-- Связь с другими паттернами: Strategy, Factory Method, Observer, Command, Chain of Responsibility.
+Конкретные примеры:
+- чтобы добавить новый канал уведомлений, достаточно реализовать новый `NotificationChannelCreator` и адаптер;
+- чтобы добавить новый алгоритм расчета цены, достаточно добавить новую реализацию `PricingStrategy`;
+- чтобы добавить новую проверку создания заказа, достаточно включить новый handler в цепочку валидации;
+- чтобы добавить новую реакцию на событие заказа, достаточно подписать нового observer на publisher.
 
 ## Проверка работоспособности
 
-Запуск демонстрационного сценария:
+### Демонстрационный запуск
 
 ```bash
 cd "Lab Work №6"
 PYTHONPATH=src python3 -m sandwich_lab6.demo
 ```
 
-Запуск тестов:
+Фактический вывод:
+
+```text
+Создан заказ: o-600, итоговая сумма: 450.0
+Статус заказа: in_preparation, история: ['placed', 'in_preparation']
+Отправленные уведомления:
+- push -> push-postman: Заказ #o-600 создан со статусом placed.
+- email -> postman@example.com: Заказ #o-600 создан со статусом placed.
+- push -> push-postman: Заказ #o-600 переведен в статус in_preparation.
+- email -> postman@example.com: Заказ #o-600 переведен в статус in_preparation.
+Аудит каналов: ['before:push:push-postman', 'after:push:push-postman', 'before:email:postman@example.com', 'after:email:postman@example.com', 'before:push:push-postman', 'after:push:push-postman', 'before:email:postman@example.com', 'after:email:postman@example.com']
+```
+
+Этот запуск подтверждает сквозной сценарий:
+- заказ создается через builder и command;
+- сумма считается через strategy;
+- статус меняется через state machine;
+- observer публикует уведомления;
+- decorator фиксирует аудит каналов.
+
+### Автотесты
 
 ```bash
 cd "Lab Work №6"
 python3 -m unittest discover -s tests -v
 ```
 
-Покрываемые тестами сценарии:
+Проверяемые сценарии:
 - singleton-конфигурация;
-- список клиентов и proxy-кэш;
-- создание заказа через command + builder + strategy;
-- смена статуса через state machine;
-- блокировка недопустимого перехода через chain of responsibility;
-- аудит уведомлений через decorator.
+- обязательные поля builder;
+- proxy-кеш репозитория клиентов;
+- создание заказа через command + builder + strategy + observer;
+- расчет суммы для доставки;
+- корректная смена статуса;
+- блокировка недопустимого перехода;
+- decorator-аудит;
+- factory method для каналов уведомлений;
+- hook в command bus.
+
+При фактическом прогоне получен результат:
+
+```text
+Ran 10 tests in 0.001s
+
+OK
+```
+
+Дополнительно `pytest` также подтверждает корректность набора тестов:
+
+```text
+10 passed in 0.01s
+```
 
 ## Вывод
 
-В модуле `sandwich_lab6` реализован полноценный набор GoF-паттернов для предметной области системы заказов: 3 порождающих, 4 структурных и 5 поведенческих.  
-Архитектура дополнительно проанализирована с позиции GRASP: выделены 5 ролей классов, 3 принципа разработки и целевое свойство программы — расширяемость.  
-Полученная реализация подтверждена демонстрационным запуском и автотестами.
+В лабораторной работе реализован учебный модуль `sandwich_lab6`, где жизненный цикл заказа построен на реальном сочетании GoF-паттернов: `Singleton`, `Builder`, `Factory Method`, `Adapter`, `Decorator`, `Proxy`, `Facade`, `Strategy`, `Observer`, `State`, `Command`, `Chain of Responsibility`.  
+Роли классов и архитектурные решения дополнительно объяснены через GRASP и принципы `Low Coupling`, `High Cohesion`, `Protected Variations`.  
+Работа подтверждена демонстрационным сценарием и автотестами, поэтому модуль не только иллюстрирует паттерны, но и показывает их совместную работу в одном прикладном процессе.
