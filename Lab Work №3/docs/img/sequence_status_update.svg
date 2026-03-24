@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1820" height="1040" viewBox="0 0 1820 1040">
+  <defs>
+    <style>
+      .title { font: 700 28px Arial, sans-serif; fill: #111827; }
+      .subtitle { font: 500 16px Arial, sans-serif; fill: #374151; }
+      .participant { fill: #ffffff; stroke: #64748b; stroke-width: 1.8; rx: 10; }
+      .participant-text { font: 700 14px Arial, sans-serif; fill: #0f172a; }
+      .actor-label { font: 700 13px Arial, sans-serif; fill: #0f172a; text-anchor: middle; }
+      .life { stroke: #94a3b8; stroke-width: 2; stroke-dasharray: 8 8; }
+      .msg { stroke: #1e293b; stroke-width: 2.2; fill: none; marker-end: url(#arrow); }
+      .ret { stroke: #475569; stroke-width: 1.9; stroke-dasharray: 7 6; fill: none; marker-end: url(#arrow2); }
+      .note { font: 500 12px Arial, sans-serif; fill: #1f2937; }
+      .step { font: 600 12px Arial, sans-serif; fill: #334155; }
+      .bg { fill: #f8fafc; }
+      .actor-line { stroke: #0f172a; stroke-width: 2.2; fill: none; }
+      .actor-head { stroke: #0f172a; stroke-width: 2.2; fill: #ffffff; }
+    </style>
+    <marker id="arrow" markerWidth="11" markerHeight="8" refX="10" refY="4" orient="auto">
+      <path d="M0,0 L11,4 L0,8 z" fill="#1e293b"/>
+    </marker>
+    <marker id="arrow2" markerWidth="11" markerHeight="8" refX="10" refY="4" orient="auto">
+      <path d="M0,0 L11,4 L0,8 z" fill="#475569"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1820" height="1040" class="bg"/>
+  <text x="34" y="52" class="title">Лабораторная работа №3 - диаграмма последовательностей</text>
+  <text x="34" y="80" class="subtitle">Сценарий: сотрудник магазина меняет статус заказа, система уведомляет клиента</text>
+
+  <g>
+    <circle cx="115" cy="130" r="18" class="actor-head"/>
+    <line x1="115" y1="148" x2="115" y2="186" class="actor-line"/>
+    <line x1="92" y1="162" x2="138" y2="162" class="actor-line"/>
+    <line x1="115" y1="186" x2="96" y2="210" class="actor-line"/>
+    <line x1="115" y1="186" x2="134" y2="210" class="actor-line"/>
+    <text x="115" y="232" class="actor-label">Сотрудник магазина</text>
+
+    <rect x="240" y="120" width="170" height="52" class="participant"/>
+    <text x="280" y="151" class="participant-text">Панель магазина</text>
+
+    <rect x="490" y="120" width="190" height="52" class="participant"/>
+    <text x="523" y="151" class="participant-text">API Controller</text>
+
+    <rect x="770" y="120" width="210" height="52" class="participant"/>
+    <text x="796" y="151" class="participant-text">OrderStatusService</text>
+
+    <rect x="1050" y="120" width="190" height="52" class="participant"/>
+    <text x="1062" y="151" class="participant-text">Репозиторий заказов</text>
+
+    <rect x="1310" y="120" width="190" height="52" class="participant"/>
+    <text x="1331" y="151" class="participant-text">Правила переходов</text>
+
+    <rect x="1570" y="120" width="190" height="52" class="participant"/>
+    <text x="1593" y="151" class="participant-text">Диспетчер уведомлений</text>
+
+    <line x1="115" y1="220" x2="115" y2="980" class="life"/>
+    <line x1="325" y1="172" x2="325" y2="980" class="life"/>
+    <line x1="585" y1="172" x2="585" y2="980" class="life"/>
+    <line x1="875" y1="172" x2="875" y2="980" class="life"/>
+    <line x1="1145" y1="172" x2="1145" y2="980" class="life"/>
+    <line x1="1405" y1="172" x2="1405" y2="980" class="life"/>
+    <line x1="1665" y1="172" x2="1665" y2="980" class="life"/>
+
+    <path d="M115 260 L325 260" class="msg"/>
+    <text x="142" y="249" class="note">выбирает заказ и новый статус</text>
+    <text x="94" y="264" class="step">1</text>
+
+    <path d="M325 320 L585 320" class="msg"/>
+    <text x="348" y="309" class="note">POST /orders/{id}/status</text>
+    <text x="304" y="324" class="step">2</text>
+
+    <path d="M585 380 L875 380" class="msg"/>
+    <text x="610" y="369" class="note">update_status(order_id, new_status)</text>
+    <text x="564" y="384" class="step">3</text>
+
+    <path d="M875 440 L1145 440" class="msg"/>
+    <text x="920" y="429" class="note">get(order_id)</text>
+    <text x="854" y="444" class="step">4</text>
+
+    <path d="M1145 470 L875 470" class="ret"/>
+    <text x="1000" y="459" class="note">заказ</text>
+
+    <path d="M875 530 L1405 530" class="msg"/>
+    <text x="950" y="519" class="note">ensure_transition_allowed(...)</text>
+    <text x="854" y="534" class="step">5</text>
+
+    <path d="M1405 560 L875 560" class="ret"/>
+    <text x="1120" y="549" class="note">допустимо</text>
+
+    <text x="900" y="620" class="note">order.advance_to(new_status)</text>
+    <text x="854" y="624" class="step">6</text>
+
+    <path d="M875 680 L1145 680" class="msg"/>
+    <text x="950" y="669" class="note">save(order)</text>
+    <text x="854" y="684" class="step">7</text>
+
+    <path d="M875 745 L1665 745" class="msg"/>
+    <text x="1010" y="734" class="note">dispatch_status_changed(order)</text>
+    <text x="854" y="749" class="step">8</text>
+
+    <text x="1535" y="800" class="note">отправляет push/email</text>
+
+    <path d="M1665 835 L875 835" class="ret"/>
+    <text x="1180" y="824" class="note">список уведомлений</text>
+
+    <path d="M875 900 L585 900" class="ret"/>
+    <text x="690" y="889" class="note">StatusUpdateResult</text>
+    <text x="854" y="904" class="step">9</text>
+
+    <path d="M585 945 L325 945" class="ret"/>
+    <text x="384" y="934" class="note">200 OK + обновленный заказ</text>
+    <text x="564" y="949" class="step">10</text>
+
+    <path d="M325 980 L115 980" class="ret"/>
+    <text x="142" y="969" class="note">интерфейс показывает новый статус</text>
+    <text x="304" y="984" class="step">11</text>
+  </g>
+</svg>

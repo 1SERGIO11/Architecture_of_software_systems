@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="860" viewBox="0 0 1400 860">
+  <defs>
+    <style>
+      .title { font: 700 28px Arial, sans-serif; fill: #1f2937; }
+      .subtitle { font: 500 16px Arial, sans-serif; fill: #374151; }
+      .box-title { font: 700 18px Arial, sans-serif; fill: #111827; }
+      .box-text { font: 500 14px Arial, sans-serif; fill: #1f2937; }
+      .group-title { font: 700 17px Arial, sans-serif; fill: #0f172a; }
+      .edge { stroke: #334155; stroke-width: 2.2; fill: none; marker-end: url(#arrow); }
+      .soft { fill: #f8fafc; stroke: #94a3b8; stroke-width: 1.8; rx: 12; }
+      .core { fill: #eff6ff; stroke: #2563eb; stroke-width: 2.3; rx: 14; }
+      .external { fill: #fff7ed; stroke: #f97316; stroke-width: 2; rx: 12; }
+      .db { fill: #ecfeff; stroke: #0891b2; stroke-width: 2.1; rx: 12; }
+      .group { fill: #ffffff; stroke: #cbd5e1; stroke-width: 1.6; rx: 16; }
+      .edge-label { font: 500 12px Arial, sans-serif; fill: #334155; }
+    </style>
+    <marker id="arrow" markerWidth="12" markerHeight="9" refX="11" refY="4.5" orient="auto">
+      <path d="M0,0 L12,4.5 L0,9 z" fill="#334155" />
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1400" height="860" fill="#f1f5f9"/>
+  <text x="36" y="52" class="title">Lab Work 3 - C4 Container Diagram</text>
+  <text x="36" y="80" class="subtitle">Use case: update order status and notify customer</text>
+
+  <rect x="28" y="106" width="280" height="520" class="group"/>
+  <text x="46" y="138" class="group-title">User-facing apps</text>
+
+  <rect x="48" y="170" width="240" height="110" class="soft"/>
+  <text x="62" y="200" class="box-title">Mobile App / Web</text>
+  <text x="62" y="226" class="box-text">Customer creates order</text>
+  <text x="62" y="248" class="box-text">Tracks status updates</text>
+
+  <rect x="48" y="310" width="240" height="110" class="soft"/>
+  <text x="62" y="340" class="box-title">Store Panel</text>
+  <text x="62" y="366" class="box-text">Staff updates order status</text>
+
+  <rect x="48" y="450" width="240" height="110" class="soft"/>
+  <text x="62" y="480" class="box-title">Courier App</text>
+  <text x="62" y="506" class="box-text">Courier confirms delivery</text>
+
+  <rect x="350" y="106" width="700" height="620" class="group"/>
+  <text x="372" y="138" class="group-title">Sandwich Ordering and Notification System</text>
+
+  <rect x="390" y="190" width="420" height="170" class="core"/>
+  <text x="410" y="228" class="box-title">Order Management API</text>
+  <text x="410" y="254" class="box-text">Python HTTP server</text>
+  <text x="410" y="278" class="box-text">Order lifecycle + validation + routing</text>
+  <text x="410" y="302" class="box-text">Sends notifications after status change</text>
+
+  <rect x="390" y="410" width="420" height="130" class="db"/>
+  <text x="410" y="448" class="box-title">Orders Database</text>
+  <text x="410" y="474" class="box-text">Orders, statuses, payment, notifications</text>
+
+  <rect x="1090" y="106" width="282" height="620" class="group"/>
+  <text x="1112" y="138" class="group-title">External providers</text>
+
+  <rect x="1110" y="186" width="242" height="110" class="external"/>
+  <text x="1124" y="216" class="box-title">Push/Email Provider</text>
+  <text x="1124" y="242" class="box-text">Delivery channels</text>
+
+  <rect x="1110" y="332" width="242" height="110" class="external"/>
+  <text x="1124" y="362" class="box-title">Map Provider</text>
+  <text x="1124" y="388" class="box-text">ETA and routing data</text>
+
+  <rect x="1110" y="478" width="242" height="110" class="external"/>
+  <text x="1124" y="508" class="box-title">Payment Provider</text>
+  <text x="1124" y="534" class="box-text">Payment status sync</text>
+
+  <path d="M288 225 L390 225" class="edge"/>
+  <text x="304" y="214" class="edge-label">HTTPS/JSON</text>
+
+  <path d="M288 365 L390 275" class="edge"/>
+  <text x="304" y="326" class="edge-label">status updates</text>
+
+  <path d="M288 505 L390 318" class="edge"/>
+  <text x="300" y="446" class="edge-label">delivery events</text>
+
+  <path d="M810 250 L1110 241" class="edge"/>
+  <text x="868" y="230" class="edge-label">notification calls</text>
+
+  <path d="M810 282 L1110 386" class="edge"/>
+  <text x="874" y="348" class="edge-label">route lookup</text>
+
+  <path d="M810 300 L1110 530" class="edge"/>
+  <text x="874" y="440" class="edge-label">payment status</text>
+
+  <path d="M600 360 L600 410" class="edge"/>
+  <text x="612" y="392" class="edge-label">CRUD</text>
+</svg>
