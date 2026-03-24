@@ -17,8 +17,8 @@
   </defs>
 
   <rect x="0" y="0" width="1700" height="1080" class="bg"/>
-  <text x="34" y="52" class="title">Lab Work 3 - UML Class Diagram (Database Model)</text>
-  <text x="34" y="80" class="subtitle">8 entities for order, payment, delivery and notifications</text>
+  <text x="34" y="52" class="title">Лабораторная работа №3 - UML-модель данных</text>
+  <text x="34" y="80" class="subtitle">8 сущностей для заказа, оплаты, доставки и уведомлений</text>
 
   <g>
     <rect x="70" y="140" width="300" height="190" class="entity"/>
