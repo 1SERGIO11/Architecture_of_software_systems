@@ -1,0 +1,134 @@
+<mxfile host="app.diagrams.net" modified="2026-03-17T00:50:00.000Z" agent="Codex" version="26.0.11" type="device">
+  <diagram id="lab2-c3-notify" name="C3 Сервис уведомлений">
+    <mxGraphModel dx="2400" dy="1600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2200" pageHeight="1500" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="c3n_title" value="C4 Model Level 3: Компоненты контейнера «Сервис уведомлений»" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=26;fontStyle=1;fontColor=#1a1a1a;" vertex="1" parent="1">
+          <mxGeometry x="40" y="24" width="1040" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3n_subtitle" value="Показаны два потока: событийная отправка уведомлений и административное управление шаблонами и каналами" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontColor=#555555;" vertex="1" parent="1">
+          <mxGeometry x="40" y="64" width="1180" height="24" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c3n_admin_actor" value="Администратор системы&#xa;[Person]" style="html=1;fontSize=11;dashed=0;whiteSpace=wrap;fillColor=#083F75;strokeColor=#06315C;fontColor=#ffffff;shape=mxgraph.c4.person2;align=center;verticalAlign=middle;resizable=1;" vertex="1" parent="1">
+          <mxGeometry x="70" y="70" width="190" height="150" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3n_backoffice" value="Back-office портал&#xa;[External Container: Web App]&#xa;&#xa;Экран шаблонов, каналов и журнала уведомлений." style="shape=mxgraph.c4.webBrowserContainer;whiteSpace=wrap;html=1;boundedLbl=1;labelBackgroundColor=none;fillColor=#118ACD;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;resizable=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="270" width="260" height="140" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3n_api_gateway" value="API Gateway / Backend&#xa;[External Container: REST API]&#xa;&#xa;Маршрутизирует административные запросы в сервис уведомлений." style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;labelBackgroundColor=none;fillColor=#23A2D9;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#0E7DAD;resizable=1;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="370" y="280" width="300" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3n_bus" value="Шина событий&#xa;[External Container: Message Bus]&#xa;&#xa;События смены статуса заказа." style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;resizable=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="830" y="90" width="300" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3n_client_actor" value="Клиент&#xa;[Person]" style="html=1;fontSize=11;dashed=0;whiteSpace=wrap;fillColor=#083F75;strokeColor=#06315C;fontColor=#ffffff;shape=mxgraph.c4.person2;align=center;verticalAlign=middle;resizable=1;" vertex="1" parent="1">
+          <mxGeometry x="1730" y="90" width="170" height="150" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3n_provider" value="Push / Email провайдер&#xa;[External Software System]&#xa;&#xa;Фактическая доставка push- и email-сообщений." style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;resizable=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1640" y="450" width="320" height="120" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c3n_boundary" value="Сервис уведомлений&#xa;[Container]" style="rounded=1;fontSize=12;whiteSpace=wrap;html=1;dashed=1;arcSize=20;fillColor=none;strokeColor=#666666;fontColor=#333333;labelBackgroundColor=none;align=left;verticalAlign=top;spacing=12;dashPattern=8 4;strokeWidth=3;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="380" y="450" width="1180" height="760" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c3n_api" value="Notification API&#xa;[Component: Controller]&#xa;&#xa;Управление шаблонами, каналами и просмотром журнала." style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;labelBackgroundColor=none;fillColor=#85BBF0;fontColor=#000000;align=center;arcSize=10;strokeColor=#5D9DD6;resizable=1;" vertex="1" parent="1">
+          <mxGeometry x="470" y="560" width="280" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3n_consumer" value="Event Consumer&#xa;[Component: Messaging]&#xa;&#xa;Читает события из шины и нормализует payload." style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;labelBackgroundColor=none;fillColor=#85BBF0;fontColor=#000000;align=center;arcSize=10;strokeColor=#5D9DD6;resizable=1;" vertex="1" parent="1">
+          <mxGeometry x="860" y="560" width="280" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3n_router" value="Notification Router&#xa;[Component: Orchestrator]&#xa;&#xa;Выбирает получателей, каналы и маршрут обработки события." style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;labelBackgroundColor=none;fillColor=#B9E0A5;fontColor=#000000;align=center;arcSize=10;strokeColor=#7BA85A;resizable=1;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1240" y="540" width="250" height="160" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c3n_templates" value="Template and Localization&#xa;[Component: Template Catalog]&#xa;&#xa;Хранит шаблоны, локали и тексты уведомлений." style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;labelBackgroundColor=none;fillColor=#B9E0A5;fontColor=#000000;align=center;arcSize=10;strokeColor=#7BA85A;resizable=1;" vertex="1" parent="1">
+          <mxGeometry x="470" y="790" width="300" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3n_push" value="Push Channel Adapter&#xa;[Component: Outbound Port]&#xa;&#xa;Интеграция с push-провайдером и подтверждение доставки." style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;labelBackgroundColor=none;fillColor=#D9CCF7;fontColor=#000000;align=center;arcSize=10;strokeColor=#8D72C9;resizable=1;" vertex="1" parent="1">
+          <mxGeometry x="860" y="790" width="270" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3n_email" value="Email Channel Adapter&#xa;[Component: Outbound Port]&#xa;&#xa;SMTP / API интеграция для email-отправки." style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;labelBackgroundColor=none;fillColor=#D9CCF7;fontColor=#000000;align=center;arcSize=10;strokeColor=#8D72C9;resizable=1;" vertex="1" parent="1">
+          <mxGeometry x="1220" y="790" width="270" height="120" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c3n_log" value="Notification Log Repository&#xa;[Component: Repository]&#xa;&#xa;История отправки и статусы доставки." style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;labelBackgroundColor=none;fillColor=#BFE6F7;fontColor=#000000;align=center;arcSize=10;strokeColor=#5BA8CE;resizable=1;" vertex="1" parent="1">
+          <mxGeometry x="760" y="1010" width="320" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3n_retry" value="Retry Scheduler&#xa;[Component: Reliability]&#xa;&#xa;Backoff и повторные попытки при временных ошибках каналов." style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;labelBackgroundColor=none;fillColor=#D9CCF7;fontColor=#000000;align=center;arcSize=10;strokeColor=#8D72C9;resizable=1;" vertex="1" parent="1">
+          <mxGeometry x="1160" y="1010" width="280" height="120" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c3n_db" value="Операционная БД&#xa;[External Container: PostgreSQL]&#xa;&#xa;Шаблоны, настройки каналов и журнал отправки." style="shape=cylinder3;size=15;direction=south;whiteSpace=wrap;html=1;boundedLbl=1;labelBackgroundColor=none;fillColor=#23A2D9;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;resizable=1;" vertex="1" parent="1">
+          <mxGeometry x="840" y="1260" width="320" height="120" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c3n_e_admin_portal" value="использует" style="endArrow=blockThin;html=1;fontSize=11;strokeWidth=1.2;endFill=1;strokeColor=#666666;labelBackgroundColor=#ffffff;edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="c3n_admin_actor" target="c3n_backoffice">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3n_e_portal_gateway" value="HTTPS / JSON" style="endArrow=blockThin;html=1;fontSize=11;strokeWidth=1.2;endFill=1;strokeColor=#666666;labelBackgroundColor=#ffffff;edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="c3n_backoffice" target="c3n_api_gateway">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3n_e_gateway_api" value="команды администрирования" style="endArrow=blockThin;html=1;fontSize=11;strokeWidth=1.2;endFill=1;strokeColor=#666666;labelBackgroundColor=#ffffff;edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=1;entryX=0.15;entryY=0;" edge="1" parent="1" source="c3n_api_gateway" target="c3n_api">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3n_e_bus_consumer" value="order status events" style="endArrow=blockThin;html=1;fontSize=11;strokeWidth=1.2;endFill=1;strokeColor=#666666;labelBackgroundColor=#ffffff;edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="c3n_bus" target="c3n_consumer">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3n_e_consumer_router" value="передает событие" style="endArrow=blockThin;html=1;fontSize=11;strokeWidth=1.2;endFill=1;strokeColor=#666666;labelBackgroundColor=#ffffff;edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.5;entryX=0;entryY=0.4;" edge="1" parent="1" source="c3n_consumer" target="c3n_router">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3n_e_api_router" value="читает настройки и журнал" style="endArrow=blockThin;html=1;fontSize=11;strokeWidth=1.2;endFill=1;strokeColor=#666666;labelBackgroundColor=#ffffff;edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.5;entryX=0;entryY=0.7;" edge="1" parent="1" source="c3n_api" target="c3n_router">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3n_e_router_templates" value="запрашивает шаблон и локаль" style="endArrow=blockThin;html=1;fontSize=11;strokeWidth=1.2;endFill=1;strokeColor=#666666;labelBackgroundColor=#ffffff;edgeStyle=orthogonalEdgeStyle;exitX=0.1;exitY=1;entryX=1;entryY=0.3;" edge="1" parent="1" source="c3n_router" target="c3n_templates">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3n_e_router_push" value="канал push" style="endArrow=blockThin;html=1;fontSize=11;strokeWidth=1.2;endFill=1;strokeColor=#666666;labelBackgroundColor=#ffffff;edgeStyle=orthogonalEdgeStyle;exitX=0.3;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="c3n_router" target="c3n_push">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3n_e_router_email" value="канал email" style="endArrow=blockThin;html=1;fontSize=11;strokeWidth=1.2;endFill=1;strokeColor=#666666;labelBackgroundColor=#ffffff;edgeStyle=orthogonalEdgeStyle;exitX=0.7;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="c3n_router" target="c3n_email">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c3n_e_templates_log" value="чтение / запись метаданных" style="endArrow=blockThin;html=1;fontSize=11;strokeWidth=1.2;endFill=1;strokeColor=#666666;labelBackgroundColor=#ffffff;edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=1;entryX=0.1;entryY=0;" edge="1" parent="1" source="c3n_templates" target="c3n_log">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3n_e_push_log" value="логирует результат" style="endArrow=blockThin;html=1;fontSize=11;strokeWidth=1.2;endFill=1;strokeColor=#666666;labelBackgroundColor=#ffffff;edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=1;entryX=0.35;entryY=0;" edge="1" parent="1" source="c3n_push" target="c3n_log">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3n_e_email_log" value="логирует результат" style="endArrow=blockThin;html=1;fontSize=11;strokeWidth=1.2;endFill=1;strokeColor=#666666;labelBackgroundColor=#ffffff;edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=1;entryX=0.75;entryY=0;" edge="1" parent="1" source="c3n_email" target="c3n_log">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3n_e_log_retry" value="читает ошибки" style="endArrow=blockThin;html=1;fontSize=11;strokeWidth=1.2;endFill=1;strokeColor=#666666;labelBackgroundColor=#ffffff;edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="c3n_log" target="c3n_retry">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3n_e_retry_push" value="retry push" style="endArrow=blockThin;html=1;fontSize=11;strokeWidth=1.2;endFill=1;strokeColor=#666666;labelBackgroundColor=#ffffff;edgeStyle=orthogonalEdgeStyle;exitX=0.2;exitY=0;entryX=0.7;entryY=1;" edge="1" parent="1" source="c3n_retry" target="c3n_push">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3n_e_retry_email" value="retry email" style="endArrow=blockThin;html=1;fontSize=11;strokeWidth=1.2;endFill=1;strokeColor=#666666;labelBackgroundColor=#ffffff;edgeStyle=orthogonalEdgeStyle;exitX=0.8;exitY=0;entryX=0.7;entryY=1;" edge="1" parent="1" source="c3n_retry" target="c3n_email">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c3n_e_push_provider" value="push provider API" style="endArrow=blockThin;html=1;fontSize=11;strokeWidth=1.2;endFill=1;strokeColor=#666666;labelBackgroundColor=#ffffff;edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.35;entryX=0;entryY=0.35;" edge="1" parent="1" source="c3n_push" target="c3n_provider">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3n_e_email_provider" value="SMTP / email API" style="endArrow=blockThin;html=1;fontSize=11;strokeWidth=1.2;endFill=1;strokeColor=#666666;labelBackgroundColor=#ffffff;edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.65;entryX=0;entryY=0.65;" edge="1" parent="1" source="c3n_email" target="c3n_provider">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3n_e_provider_client" value="push / email delivery" style="endArrow=blockThin;html=1;fontSize=11;strokeWidth=1.2;endFill=1;strokeColor=#666666;labelBackgroundColor=#ffffff;edgeStyle=orthogonalEdgeStyle;exitX=0.7;exitY=0;entryX=0.5;entryY=1;" edge="1" parent="1" source="c3n_provider" target="c3n_client_actor">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3n_e_templates_db" value="SQL" style="endArrow=blockThin;html=1;fontSize=11;strokeWidth=1.2;endFill=1;strokeColor=#666666;labelBackgroundColor=#ffffff;edgeStyle=orthogonalEdgeStyle;exitX=0.3;exitY=1;entryX=0.25;entryY=0;" edge="1" parent="1" source="c3n_templates" target="c3n_db">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3n_e_log_db" value="SQL" style="endArrow=blockThin;html=1;fontSize=11;strokeWidth=1.2;endFill=1;strokeColor=#666666;labelBackgroundColor=#ffffff;edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=1;entryX=0.75;entryY=0;" edge="1" parent="1" source="c3n_log" target="c3n_db">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
