@@ -5,6 +5,7 @@ import time
 from datetime import datetime, timezone
 
 import psycopg
+from psycopg.errors import UniqueViolation
 from psycopg.rows import dict_row
 from psycopg.types.json import Json
 
@@ -81,27 +82,116 @@ class PostgresRepository:
                     );
                     """
                 )
-
-    def create_customer(self, customer: Customer) -> None:
-        if self.get_customer(customer.customer_id):
-            raise ConflictError(f"Клиент {customer.customer_id} уже существует.")
-
-        with psycopg.connect(self._dsn, autocommit=True) as conn:
-            with conn.cursor() as cursor:
                 cursor.execute(
                     """
-                    INSERT INTO customers (customer_id, name, email, push_token, push_enabled, email_enabled)
-                    VALUES (%s, %s, %s, %s, %s, %s)
-                    """,
-                    (
-                        customer.customer_id,
-                        customer.name,
-                        customer.email,
-                        customer.push_token,
-                        customer.preference.push_enabled,
-                        customer.preference.email_enabled,
-                    ),
+                    DO $$
+                    BEGIN
+                        IF NOT EXISTS (
+                            SELECT 1 FROM pg_constraint WHERE conname = 'customers_customer_id_not_blank_check'
+                        ) THEN
+                            ALTER TABLE customers
+                            ADD CONSTRAINT customers_customer_id_not_blank_check
+                            CHECK (btrim(customer_id) <> '');
+                        END IF;
+
+                        IF NOT EXISTS (
+                            SELECT 1 FROM pg_constraint WHERE conname = 'customers_name_not_blank_check'
+                        ) THEN
+                            ALTER TABLE customers
+                            ADD CONSTRAINT customers_name_not_blank_check
+                            CHECK (btrim(name) <> '');
+                        END IF;
+
+                        IF NOT EXISTS (
+                            SELECT 1 FROM pg_constraint WHERE conname = 'orders_order_id_not_blank_check'
+                        ) THEN
+                            ALTER TABLE orders
+                            ADD CONSTRAINT orders_order_id_not_blank_check
+                            CHECK (btrim(order_id) <> '');
+                        END IF;
+
+                        IF NOT EXISTS (
+                            SELECT 1 FROM pg_constraint WHERE conname = 'orders_customer_id_not_blank_check'
+                        ) THEN
+                            ALTER TABLE orders
+                            ADD CONSTRAINT orders_customer_id_not_blank_check
+                            CHECK (btrim(customer_id) <> '');
+                        END IF;
+
+                        IF NOT EXISTS (
+                            SELECT 1 FROM pg_constraint WHERE conname = 'orders_store_id_not_blank_check'
+                        ) THEN
+                            ALTER TABLE orders
+                            ADD CONSTRAINT orders_store_id_not_blank_check
+                            CHECK (btrim(store_id) <> '');
+                        END IF;
+
+                        IF NOT EXISTS (
+                            SELECT 1 FROM pg_constraint WHERE conname = 'orders_fulfillment_check'
+                        ) THEN
+                            ALTER TABLE orders
+                            ADD CONSTRAINT orders_fulfillment_check
+                            CHECK (fulfillment IN ('pickup', 'delivery'));
+                        END IF;
+
+                        IF NOT EXISTS (
+                            SELECT 1 FROM pg_constraint WHERE conname = 'orders_status_check'
+                        ) THEN
+                            ALTER TABLE orders
+                            ADD CONSTRAINT orders_status_check
+                            CHECK (status IN (
+                                'placed',
+                                'in_preparation',
+                                'ready_for_pickup',
+                                'out_for_delivery',
+                                'delivered',
+                                'cancelled'
+                            ));
+                        END IF;
+
+                        IF NOT EXISTS (
+                            SELECT 1 FROM pg_constraint WHERE conname = 'orders_total_amount_non_negative_check'
+                        ) THEN
+                            ALTER TABLE orders
+                            ADD CONSTRAINT orders_total_amount_non_negative_check
+                            CHECK (total_amount >= 0);
+                        END IF;
+                    END $$;
+                    """
                 )
+                cursor.execute(
+                    "CREATE INDEX IF NOT EXISTS idx_orders_customer_id ON orders(customer_id);"
+                )
+                cursor.execute(
+                    "CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);"
+                )
+                cursor.execute(
+                    "CREATE INDEX IF NOT EXISTS idx_orders_updated_at ON orders(updated_at DESC);"
+                )
+                cursor.execute(
+                    "CREATE INDEX IF NOT EXISTS idx_notifications_order_id ON notifications(order_id);"
+                )
+
+    def create_customer(self, customer: Customer) -> None:
+        with psycopg.connect(self._dsn, autocommit=True) as conn:
+            with conn.cursor() as cursor:
+                try:
+                    cursor.execute(
+                        """
+                        INSERT INTO customers (customer_id, name, email, push_token, push_enabled, email_enabled)
+                        VALUES (%s, %s, %s, %s, %s, %s)
+                        """,
+                        (
+                            customer.customer_id,
+                            customer.name,
+                            customer.email,
+                            customer.push_token,
+                            customer.preference.push_enabled,
+                            customer.preference.email_enabled,
+                        ),
+                    )
+                except UniqueViolation as exc:
+                    raise ConflictError(f"Клиент {customer.customer_id} уже существует.") from exc
 
     def get_customer(self, customer_id: str) -> Customer | None:
         with psycopg.connect(self._dsn, autocommit=True, row_factory=dict_row) as conn:
@@ -153,27 +243,27 @@ class PostgresRepository:
                 ]
 
     def create_order(self, order: Order) -> None:
-        if self.get_order(order.order_id):
-            raise ConflictError(f"Заказ {order.order_id} уже существует.")
-
         with psycopg.connect(self._dsn, autocommit=True) as conn:
             with conn.cursor() as cursor:
-                cursor.execute(
-                    """
-                    INSERT INTO orders (order_id, customer_id, store_id, fulfillment, status, history, total_amount, updated_at)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-                    """,
-                    (
-                        order.order_id,
-                        order.customer_id,
-                        order.store_id,
-                        order.fulfillment.value,
-                        order.status.value,
-                        Json([item.value for item in order.history]),
-                        order.total_amount,
-                        order.updated_at,
-                    ),
-                )
+                try:
+                    cursor.execute(
+                        """
+                        INSERT INTO orders (order_id, customer_id, store_id, fulfillment, status, history, total_amount, updated_at)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                        """,
+                        (
+                            order.order_id,
+                            order.customer_id,
+                            order.store_id,
+                            order.fulfillment.value,
+                            order.status.value,
+                            Json([item.value for item in order.history]),
+                            order.total_amount,
+                            order.updated_at,
+                        ),
+                    )
+                except UniqueViolation as exc:
+                    raise ConflictError(f"Заказ {order.order_id} уже существует.") from exc
 
     def get_order(self, order_id: str) -> Order | None:
         with psycopg.connect(self._dsn, autocommit=True, row_factory=dict_row) as conn:

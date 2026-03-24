@@ -40,6 +40,35 @@ def test_health_endpoint() -> None:
     assert payload["database"] == "ok"
 
 
+def test_duplicate_customer_conflict() -> None:
+    wait_for_api()
+
+    suffix = uuid.uuid4().hex[:8]
+    customer_id = f"it-dup-{suffix}"
+
+    first = requests.post(
+        f"{BASE_URL}/customers",
+        json={
+            "customer_id": customer_id,
+            "name": "Duplicate User",
+            "email": "duplicate@example.com",
+        },
+        timeout=10,
+    )
+    assert first.status_code == 201, first.text
+
+    second = requests.post(
+        f"{BASE_URL}/customers",
+        json={
+            "customer_id": customer_id,
+            "name": "Duplicate User Again",
+        },
+        timeout=10,
+    )
+    assert second.status_code == 409
+    assert "уже существует" in second.json()["error"]
+
+
 def test_order_crud_flow_with_postgres() -> None:
     wait_for_api()
 
@@ -118,3 +147,64 @@ def test_order_crud_flow_with_postgres() -> None:
 
     get_deleted = requests.get(f"{BASE_URL}/orders/{order_id}", timeout=10)
     assert get_deleted.status_code == 404
+
+
+def test_invalid_order_requests_are_rejected() -> None:
+    wait_for_api()
+
+    suffix = uuid.uuid4().hex[:8]
+    customer_id = f"it-invalid-c-{suffix}"
+    negative_order_id = f"it-invalid-neg-{suffix}"
+    fulfillment_order_id = f"it-invalid-ful-{suffix}"
+
+    create_customer = requests.post(
+        f"{BASE_URL}/customers",
+        json={
+            "customer_id": customer_id,
+            "name": "Validation User",
+            "email": "validation@example.com",
+        },
+        timeout=10,
+    )
+    assert create_customer.status_code == 201, create_customer.text
+
+    negative_amount = requests.post(
+        f"{BASE_URL}/orders",
+        json={
+            "order_id": negative_order_id,
+            "customer_id": customer_id,
+            "store_id": "store-invalid",
+            "fulfillment": "pickup",
+            "total_amount": -10,
+        },
+        timeout=10,
+    )
+    assert negative_amount.status_code == 400
+    assert "не может быть отрицательной" in negative_amount.json()["error"]
+
+    invalid_fulfillment = requests.post(
+        f"{BASE_URL}/orders",
+        json={
+            "order_id": fulfillment_order_id,
+            "customer_id": customer_id,
+            "store_id": "store-invalid",
+            "fulfillment": "drone",
+            "total_amount": 250,
+        },
+        timeout=10,
+    )
+    assert invalid_fulfillment.status_code == 400
+    assert "pickup или delivery" in invalid_fulfillment.json()["error"]
+
+    invalid_filter = requests.get(f"{BASE_URL}/orders?status=broken-status", timeout=10)
+    assert invalid_filter.status_code == 400
+    assert "Поле status" in invalid_filter.json()["error"]
+
+    with psycopg.connect(POSTGRES_DSN, autocommit=True) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                "SELECT COUNT(*) FROM orders WHERE order_id IN (%s, %s)",
+                (negative_order_id, fulfillment_order_id),
+            )
+            count = cursor.fetchone()[0]
+            assert count == 0

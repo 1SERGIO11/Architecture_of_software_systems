@@ -106,7 +106,7 @@ def make_handler(app: App) -> type[BaseHTTPRequestHandler]:
                     self._send_json(customer_to_dict(customer), HTTPStatus.OK)
                     return
 
-                self._send_json({"error": "not_found"}, HTTPStatus.NOT_FOUND)
+                self._send_json({"error": "Маршрут не найден."}, HTTPStatus.NOT_FOUND)
             except ApiError as exc:
                 self._send_json({"error": exc.message}, exc.status_code)
             except ValueError as exc:
@@ -144,9 +144,9 @@ def make_handler(app: App) -> type[BaseHTTPRequestHandler]:
                     self._send_json(order_to_dict(order), HTTPStatus.OK)
                     return
 
-                self._send_json({"error": "not_found"}, HTTPStatus.NOT_FOUND)
+                self._send_json({"error": "Маршрут не найден."}, HTTPStatus.NOT_FOUND)
             except KeyError as exc:
-                self._send_json({"error": f"missing_field:{exc.args[0]}"}, HTTPStatus.BAD_REQUEST)
+                self._send_json({"error": f"Поле {exc.args[0]} обязательно."}, HTTPStatus.BAD_REQUEST)
             except ApiError as exc:
                 self._send_json({"error": exc.message}, exc.status_code)
             except ValueError as exc:
@@ -164,7 +164,7 @@ def make_handler(app: App) -> type[BaseHTTPRequestHandler]:
                     order = app.service.update_order(path[3], body)
                     self._send_json(order_to_dict(order), HTTPStatus.OK)
                     return
-                self._send_json({"error": "not_found"}, HTTPStatus.NOT_FOUND)
+                self._send_json({"error": "Маршрут не найден."}, HTTPStatus.NOT_FOUND)
             except ApiError as exc:
                 self._send_json({"error": exc.message}, exc.status_code)
             except ValueError as exc:
@@ -183,7 +183,7 @@ def make_handler(app: App) -> type[BaseHTTPRequestHandler]:
                     self._send_cors_headers()
                     self.end_headers()
                     return
-                self._send_json({"error": "not_found"}, HTTPStatus.NOT_FOUND)
+                self._send_json({"error": "Маршрут не найден."}, HTTPStatus.NOT_FOUND)
             except ApiError as exc:
                 self._send_json({"error": exc.message}, exc.status_code)
             except Exception as exc:  # pragma: no cover - defensive handler

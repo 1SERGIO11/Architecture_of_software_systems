@@ -56,6 +56,9 @@ class Order:
         self.statuses.append(new_status)
         self.updated_at = datetime.now(timezone.utc)
 
+    def touch(self) -> None:
+        self.updated_at = datetime.now(timezone.utc)
+
 
 @dataclass(frozen=True)
 class NotificationRecord:

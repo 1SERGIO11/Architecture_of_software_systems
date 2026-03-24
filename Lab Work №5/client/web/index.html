@@ -30,6 +30,34 @@
         <div id="healthBadge" class="health health-pending">API: не проверено</div>
       </header>
 
+      <section class="stats-grid">
+        <article class="stat-card">
+          <span>Клиенты</span>
+          <strong id="statsCustomers">0</strong>
+          <small>доступно в системе</small>
+        </article>
+        <article class="stat-card">
+          <span>Заказы</span>
+          <strong id="statsOrders">0</strong>
+          <small>после текущего фильтра</small>
+        </article>
+        <article class="stat-card">
+          <span>Выбранный клиент</span>
+          <strong id="statsSelectedCustomer">-</strong>
+          <small>для создания заказа</small>
+        </article>
+        <article class="stat-card">
+          <span>Выбранный заказ</span>
+          <strong id="statsSelectedOrder">-</strong>
+          <small>для изменения и удаления</small>
+        </article>
+        <article class="stat-card">
+          <span>Уведомления</span>
+          <strong id="statsNotifications">0</strong>
+          <small>по активному заказу</small>
+        </article>
+      </section>
+
       <section class="panel panel-create">
         <h2>Создание клиента</h2>
         <form id="customerForm" class="grid-2">
@@ -157,6 +185,25 @@
         <div id="orderHint" class="hint">Выбери заказ в таблице, чтобы изменить или удалить его.</div>
         <div id="detailsContent" class="details hidden">
           <p class="mono">Текущий заказ: <span id="selectedOrderId">-</span></p>
+
+          <div class="facts-grid">
+            <article class="fact-card">
+              <span>Статус</span>
+              <strong id="detailStatus">-</strong>
+            </article>
+            <article class="fact-card">
+              <span>Тип получения</span>
+              <strong id="detailFulfillment">-</strong>
+            </article>
+            <article class="fact-card">
+              <span>Сумма</span>
+              <strong id="detailAmount">-</strong>
+            </article>
+            <article class="fact-card">
+              <span>Обновлен</span>
+              <strong id="detailUpdated">-</strong>
+            </article>
+          </div>
 
           <form id="updateOrderForm" class="grid-2">
             <label>

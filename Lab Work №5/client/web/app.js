@@ -24,6 +24,7 @@ const state = {
   selectedCustomerId: null,
   orders: [],
   customers: [],
+  notificationsCount: 0,
 };
 
 const refs = {
@@ -36,6 +37,15 @@ const refs = {
   notificationsBox: document.getElementById("notificationsBox"),
   logBox: document.getElementById("logBox"),
   orderHint: document.getElementById("orderHint"),
+  statsCustomers: document.getElementById("statsCustomers"),
+  statsOrders: document.getElementById("statsOrders"),
+  statsSelectedCustomer: document.getElementById("statsSelectedCustomer"),
+  statsSelectedOrder: document.getElementById("statsSelectedOrder"),
+  statsNotifications: document.getElementById("statsNotifications"),
+  detailStatus: document.getElementById("detailStatus"),
+  detailFulfillment: document.getElementById("detailFulfillment"),
+  detailAmount: document.getElementById("detailAmount"),
+  detailUpdated: document.getElementById("detailUpdated"),
 };
 
 function logLine(message, level = "INFO") {
@@ -105,6 +115,17 @@ function formatDate(value) {
   return Number.isNaN(date.getTime()) ? value : date.toLocaleString("ru-RU");
 }
 
+function renderStats() {
+  const selectedCustomer = state.customers.find((item) => item.customer_id === state.selectedCustomerId);
+  refs.statsCustomers.textContent = String(state.customers.length);
+  refs.statsOrders.textContent = String(state.orders.length);
+  refs.statsSelectedCustomer.textContent = selectedCustomer
+    ? `${selectedCustomer.customer_id}`
+    : "-";
+  refs.statsSelectedOrder.textContent = state.selectedOrderId || "-";
+  refs.statsNotifications.textContent = String(state.notificationsCount);
+}
+
 function renderCustomers() {
   refs.customersBody.innerHTML = "";
   const filter = document.getElementById("customerSearchFilter").value.trim().toLowerCase();
@@ -114,6 +135,13 @@ function renderCustomers() {
     }
     return item.customer_id.toLowerCase().includes(filter) || item.name.toLowerCase().includes(filter);
   });
+
+  if (items.length === 0) {
+    refs.customersBody.innerHTML =
+      '<tr class="empty-row"><td colspan="5">Клиенты не найдены. Создай нового клиента или сбрось фильтр.</td></tr>';
+    renderStats();
+    return;
+  }
 
   for (const item of items) {
     const tr = document.createElement("tr");
@@ -131,10 +159,12 @@ function renderCustomers() {
       state.selectedCustomerId = item.customer_id;
       document.querySelector("#orderForm input[name='customer_id']").value = item.customer_id;
       renderCustomers();
+      renderStats();
       logLine(`Выбран клиент ${item.customer_id} для создания заказа.`);
     });
     refs.customersBody.appendChild(tr);
   }
+  renderStats();
 }
 
 async function loadCustomers() {
@@ -150,6 +180,12 @@ async function loadCustomers() {
 
 function renderOrders() {
   refs.ordersBody.innerHTML = "";
+  if (state.orders.length === 0) {
+    refs.ordersBody.innerHTML =
+      '<tr class="empty-row"><td colspan="7">Заказы по текущему фильтру не найдены.</td></tr>';
+    renderStats();
+    return;
+  }
   for (const item of state.orders) {
     const tr = document.createElement("tr");
     if (item.order_id === state.selectedOrderId) {
@@ -171,6 +207,7 @@ function renderOrders() {
     });
     refs.ordersBody.appendChild(tr);
   }
+  renderStats();
 }
 
 async function loadOrders() {
@@ -193,6 +230,17 @@ async function loadOrders() {
       const selected = state.orders.find((item) => item.order_id === state.selectedOrderId);
       if (selected) {
         showDetails(selected);
+      } else {
+        state.selectedOrderId = null;
+        state.notificationsCount = 0;
+        refs.detailsContent.classList.add("hidden");
+        refs.orderHint.classList.remove("hidden");
+        refs.notificationsBox.innerHTML = "";
+        refs.detailStatus.textContent = "-";
+        refs.detailFulfillment.textContent = "-";
+        refs.detailAmount.textContent = "-";
+        refs.detailUpdated.textContent = "-";
+        renderStats();
       }
     }
   } catch (error) {
@@ -204,6 +252,10 @@ function showDetails(order) {
   refs.orderHint.classList.add("hidden");
   refs.detailsContent.classList.remove("hidden");
   refs.selectedOrderId.textContent = order.order_id;
+  refs.detailStatus.textContent = normalizeStatus(order.status);
+  refs.detailFulfillment.textContent = normalizeFulfillment(order.fulfillment);
+  refs.detailAmount.textContent = String(order.total_amount);
+  refs.detailUpdated.textContent = formatDate(order.updated_at);
   refs.orderTimeline.innerHTML = "";
   for (const stateName of order.history || []) {
     const step = document.createElement("div");
@@ -211,6 +263,7 @@ function showDetails(order) {
     step.textContent = normalizeStatus(stateName);
     refs.orderTimeline.appendChild(step);
   }
+  renderStats();
 }
 
 async function loadOrderById(orderId) {
@@ -342,9 +395,11 @@ async function loadNotifications() {
   try {
     const result = await api(`/orders/${state.selectedOrderId}/notifications`, { method: "GET" });
     const items = result.items || [];
+    state.notificationsCount = items.length;
     refs.notificationsBox.innerHTML = "";
     if (items.length === 0) {
       refs.notificationsBox.textContent = "Уведомления не найдены.";
+      renderStats();
       return;
     }
     for (const item of items) {
@@ -357,6 +412,7 @@ async function loadNotifications() {
       `;
       refs.notificationsBox.appendChild(card);
     }
+    renderStats();
     logLine(`Загружено уведомлений: ${items.length}.`);
   } catch (error) {
     logLine(`Ошибка загрузки уведомлений: ${error.message}`, "ERROR");
@@ -372,10 +428,16 @@ async function deleteOrder() {
   try {
     await api(`/orders/${orderId}`, { method: "DELETE" });
     state.selectedOrderId = null;
+    state.notificationsCount = 0;
     refs.detailsContent.classList.add("hidden");
     refs.orderHint.classList.remove("hidden");
+    refs.detailStatus.textContent = "-";
+    refs.detailFulfillment.textContent = "-";
+    refs.detailAmount.textContent = "-";
+    refs.detailUpdated.textContent = "-";
     refs.notificationsBox.innerHTML = "";
     await loadOrders();
+    renderStats();
     logLine(`Заказ ${orderId} удален.`);
   } catch (error) {
     logLine(`Ошибка удаления заказа: ${error.message}`, "ERROR");
@@ -401,6 +463,7 @@ async function bootstrap() {
   await checkHealth();
   await loadCustomers();
   await loadOrders();
+  renderStats();
 }
 
 bootstrap();
