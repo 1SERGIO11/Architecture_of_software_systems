@@ -1,5 +1,5 @@
 {
-  "base": "http://127.0.0.1:50477",
+  "base": "http://127.0.0.1:64185",
   "results": [
     {
       "step": 1,
@@ -13,7 +13,7 @@
         },
         "headers": {
           "Server": "BaseHTTP/0.6 Python/3.14.3",
-          "Date": "Tue, 10 Mar 2026 15:30:28 GMT",
+          "Date": "Tue, 17 Mar 2026 14:16:32 GMT",
           "Content-Type": "application/json; charset=utf-8",
           "Content-Length": "16"
         }
@@ -41,7 +41,7 @@
         },
         "headers": {
           "Server": "BaseHTTP/0.6 Python/3.14.3",
-          "Date": "Tue, 10 Mar 2026 15:30:28 GMT",
+          "Date": "Tue, 17 Mar 2026 14:16:32 GMT",
           "Content-Type": "application/json; charset=utf-8",
           "Content-Length": "143"
         }
@@ -62,7 +62,7 @@
         },
         "headers": {
           "Server": "BaseHTTP/0.6 Python/3.14.3",
-          "Date": "Tue, 10 Mar 2026 15:30:28 GMT",
+          "Date": "Tue, 17 Mar 2026 14:16:32 GMT",
           "Content-Type": "application/json; charset=utf-8",
           "Content-Length": "62"
         }
@@ -85,7 +85,7 @@
         },
         "headers": {
           "Server": "BaseHTTP/0.6 Python/3.14.3",
-          "Date": "Tue, 10 Mar 2026 15:30:28 GMT",
+          "Date": "Tue, 17 Mar 2026 14:16:32 GMT",
           "Content-Type": "application/json; charset=utf-8",
           "Content-Length": "143"
         }
@@ -103,7 +103,7 @@
         },
         "headers": {
           "Server": "BaseHTTP/0.6 Python/3.14.3",
-          "Date": "Tue, 10 Mar 2026 15:30:28 GMT",
+          "Date": "Tue, 17 Mar 2026 14:16:32 GMT",
           "Content-Type": "application/json; charset=utf-8",
           "Content-Length": "52"
         }
@@ -132,11 +132,11 @@
             "placed"
           ],
           "total_amount": 320.0,
-          "updated_at": "2026-03-10T15:30:28.380218+00:00"
+          "updated_at": "2026-03-17T14:16:32.758961+00:00"
         },
         "headers": {
           "Server": "BaseHTTP/0.6 Python/3.14.3",
-          "Date": "Tue, 10 Mar 2026 15:30:28 GMT",
+          "Date": "Tue, 17 Mar 2026 14:16:32 GMT",
           "Content-Type": "application/json; charset=utf-8",
           "Content-Length": "213"
         }
@@ -160,7 +160,7 @@
         },
         "headers": {
           "Server": "BaseHTTP/0.6 Python/3.14.3",
-          "Date": "Tue, 10 Mar 2026 15:30:28 GMT",
+          "Date": "Tue, 17 Mar 2026 14:16:32 GMT",
           "Content-Type": "application/json; charset=utf-8",
           "Content-Length": "92"
         }
@@ -168,6 +168,30 @@
     },
     {
       "step": 8,
+      "method": "POST",
+      "path": "/api/v1/orders",
+      "request_body": {
+        "order_id": "demo-o3",
+        "customer_id": "demo-c1",
+        "store_id": "store-1",
+        "fulfillment": "pickup",
+        "total_amount": -5
+      },
+      "response": {
+        "status": 400,
+        "body": {
+          "error": "Сумма заказа не может быть отрицательной."
+        },
+        "headers": {
+          "Server": "BaseHTTP/0.6 Python/3.14.3",
+          "Date": "Tue, 17 Mar 2026 14:16:32 GMT",
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Length": "89"
+        }
+      }
+    },
+    {
+      "step": 9,
       "method": "GET",
       "path": "/api/v1/orders",
       "request_body": null,
@@ -185,20 +209,20 @@
                 "placed"
               ],
               "total_amount": 320.0,
-              "updated_at": "2026-03-10T15:30:28.380218+00:00"
+              "updated_at": "2026-03-17T14:16:32.758961+00:00"
             }
           ]
         },
         "headers": {
           "Server": "BaseHTTP/0.6 Python/3.14.3",
-          "Date": "Tue, 10 Mar 2026 15:30:28 GMT",
+          "Date": "Tue, 17 Mar 2026 14:16:32 GMT",
           "Content-Type": "application/json; charset=utf-8",
           "Content-Length": "226"
         }
       }
     },
     {
-      "step": 9,
+      "step": 10,
       "method": "GET",
       "path": "/api/v1/orders/demo-o1",
       "request_body": null,
@@ -214,18 +238,18 @@
             "placed"
           ],
           "total_amount": 320.0,
-          "updated_at": "2026-03-10T15:30:28.380218+00:00"
+          "updated_at": "2026-03-17T14:16:32.758961+00:00"
         },
         "headers": {
           "Server": "BaseHTTP/0.6 Python/3.14.3",
-          "Date": "Tue, 10 Mar 2026 15:30:28 GMT",
+          "Date": "Tue, 17 Mar 2026 14:16:32 GMT",
           "Content-Type": "application/json; charset=utf-8",
           "Content-Length": "213"
         }
       }
     },
     {
-      "step": 10,
+      "step": 11,
       "method": "PUT",
       "path": "/api/v1/orders/demo-o1",
       "request_body": {
@@ -243,18 +267,38 @@
             "placed"
           ],
           "total_amount": 410.0,
-          "updated_at": "2026-03-10T15:30:28.380218+00:00"
+          "updated_at": "2026-03-17T14:16:32.760744+00:00"
         },
         "headers": {
           "Server": "BaseHTTP/0.6 Python/3.14.3",
-          "Date": "Tue, 10 Mar 2026 15:30:28 GMT",
+          "Date": "Tue, 17 Mar 2026 14:16:32 GMT",
           "Content-Type": "application/json; charset=utf-8",
           "Content-Length": "213"
         }
       }
     },
     {
-      "step": 11,
+      "step": 12,
+      "method": "PUT",
+      "path": "/api/v1/orders/demo-o1",
+      "request_body": {
+        "fulfillment": "drone"
+      },
+      "response": {
+        "status": 400,
+        "body": {
+          "error": "Поле fulfillment должно быть pickup или delivery."
+        },
+        "headers": {
+          "Server": "BaseHTTP/0.6 Python/3.14.3",
+          "Date": "Tue, 17 Mar 2026 14:16:32 GMT",
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Length": "79"
+        }
+      }
+    },
+    {
+      "step": 13,
       "method": "POST",
       "path": "/api/v1/orders/demo-o1/status",
       "request_body": {
@@ -273,18 +317,18 @@
             "in_preparation"
           ],
           "total_amount": 410.0,
-          "updated_at": "2026-03-10T15:30:28.381612+00:00"
+          "updated_at": "2026-03-17T14:16:32.761490+00:00"
         },
         "headers": {
           "Server": "BaseHTTP/0.6 Python/3.14.3",
-          "Date": "Tue, 10 Mar 2026 15:30:28 GMT",
+          "Date": "Tue, 17 Mar 2026 14:16:32 GMT",
           "Content-Type": "application/json; charset=utf-8",
           "Content-Length": "239"
         }
       }
     },
     {
-      "step": 12,
+      "step": 14,
       "method": "POST",
       "path": "/api/v1/orders/demo-o1/status",
       "request_body": {
@@ -297,14 +341,14 @@
         },
         "headers": {
           "Server": "BaseHTTP/0.6 Python/3.14.3",
-          "Date": "Tue, 10 Mar 2026 15:30:28 GMT",
+          "Date": "Tue, 17 Mar 2026 14:16:32 GMT",
           "Content-Type": "application/json; charset=utf-8",
           "Content-Length": "97"
         }
       }
     },
     {
-      "step": 13,
+      "step": 15,
       "method": "GET",
       "path": "/api/v1/orders/demo-o1/notifications",
       "request_body": null,
@@ -313,49 +357,49 @@
         "body": {
           "items": [
             {
-              "notification_id": "4c21bc41-82f8-49a2-bf3d-ca59136592b3",
+              "notification_id": "00fa8dd1-1984-4364-8234-2e1cbb5f4795",
               "order_id": "demo-o1",
               "channel": "push",
               "recipient": "push-demo",
               "message": "Заказ принят: заказ #demo-o1, статус placed.",
-              "created_at": "2026-03-10T15:30:28.380255+00:00"
+              "created_at": "2026-03-17T14:16:32.758986+00:00"
             },
             {
-              "notification_id": "5b80bc37-5d45-4432-b316-9a4adb588fa8",
+              "notification_id": "2465e2bb-20c2-49e9-8e9a-a537bfec800d",
               "order_id": "demo-o1",
               "channel": "email",
               "recipient": "demo@example.com",
               "message": "Заказ принят: заказ #demo-o1, статус placed.",
-              "created_at": "2026-03-10T15:30:28.380265+00:00"
+              "created_at": "2026-03-17T14:16:32.758994+00:00"
             },
             {
-              "notification_id": "194737ca-1b0a-4bbb-89d3-b87bc16fb9e7",
+              "notification_id": "4340d0b2-9915-4a24-8872-7f3827f8b012",
               "order_id": "demo-o1",
               "channel": "push",
               "recipient": "push-demo",
               "message": "Заказ готовится: заказ #demo-o1, статус in_preparation.",
-              "created_at": "2026-03-10T15:30:28.381627+00:00"
+              "created_at": "2026-03-17T14:16:32.761510+00:00"
             },
             {
-              "notification_id": "fa459ffe-c159-4719-a728-87cffc0c6328",
+              "notification_id": "d9e2a1dd-1970-46cb-aab4-13cb79ae6755",
               "order_id": "demo-o1",
               "channel": "email",
               "recipient": "demo@example.com",
               "message": "Заказ готовится: заказ #demo-o1, статус in_preparation.",
-              "created_at": "2026-03-10T15:30:28.381631+00:00"
+              "created_at": "2026-03-17T14:16:32.761516+00:00"
             }
           ]
         },
         "headers": {
           "Server": "BaseHTTP/0.6 Python/3.14.3",
-          "Date": "Tue, 10 Mar 2026 15:30:28 GMT",
+          "Date": "Tue, 17 Mar 2026 14:16:32 GMT",
           "Content-Type": "application/json; charset=utf-8",
           "Content-Length": "1095"
         }
       }
     },
     {
-      "step": 14,
+      "step": 16,
       "method": "DELETE",
       "path": "/api/v1/orders/demo-o1",
       "request_body": null,
@@ -364,12 +408,12 @@
         "body": null,
         "headers": {
           "Server": "BaseHTTP/0.6 Python/3.14.3",
-          "Date": "Tue, 10 Mar 2026 15:30:28 GMT"
+          "Date": "Tue, 17 Mar 2026 14:16:32 GMT"
         }
       }
     },
     {
-      "step": 15,
+      "step": 17,
       "method": "DELETE",
       "path": "/api/v1/orders/demo-o1",
       "request_body": null,
@@ -380,7 +424,7 @@
         },
         "headers": {
           "Server": "BaseHTTP/0.6 Python/3.14.3",
-          "Date": "Tue, 10 Mar 2026 15:30:28 GMT",
+          "Date": "Tue, 17 Mar 2026 14:16:32 GMT",
           "Content-Type": "application/json; charset=utf-8",
           "Content-Length": "50"
         }

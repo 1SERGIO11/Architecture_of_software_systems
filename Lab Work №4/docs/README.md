@@ -18,6 +18,16 @@
 }
 ```
 
+### Ключевые правила API
+- клиент должен быть создан до оформления заказа;
+- `fulfillment` может принимать только значения `pickup` или `delivery`;
+- `total_amount` не может быть отрицательным;
+- `updated_at` меняется при создании заказа, обновлении его параметров и смене статуса;
+- уведомления создаются при создании заказа и при каждом успешном переходе в новый статус;
+- допустимые переходы статусов зависят от типа исполнения заказа:
+  - `pickup`: `placed -> in_preparation -> ready_for_pickup -> delivered`;
+  - `delivery`: `placed -> in_preparation -> ready_for_pickup -> out_for_delivery -> delivered`.
+
 ### 1. Проверка доступности сервиса
 
 Метод: `GET`  
@@ -113,6 +123,11 @@ URL: `/orders`
 
 Назначение: создание нового заказа для выбранного клиента.
 
+Ключевые ограничения:
+- клиент с указанным `customer_id` должен существовать;
+- `total_amount >= 0`;
+- `fulfillment` должен быть равен `pickup` или `delivery`.
+
 Параметры запроса: отсутствуют.  
 Заголовки запроса:
 - `Content-Type: application/json; charset=utf-8`
@@ -156,6 +171,8 @@ URL: `/orders`
 Параметры запроса:
 - `status` (query, опционально)
 - `customer_id` (query, опционально)
+
+Значение параметра `status`, если оно передано, должно соответствовать одному из допустимых статусов заказа.
 
 Заголовки запроса: отсутствуют.  
 Тело запроса: отсутствует.
@@ -218,6 +235,8 @@ URL: `/orders/{order_id}/status`
 
 Назначение: перевод заказа в следующий допустимый статус.
 
+Переход будет принят только в том случае, если он разрешен для текущего типа заказа (`pickup` или `delivery`).
+
 Параметры запроса:
 - `order_id` (path, обязательный)
 
@@ -256,6 +275,8 @@ URL: `/orders/{order_id}/notifications`
 
 Назначение: получение списка сформированных уведомлений для заказа.
 
+В список попадают уведомления, созданные в момент оформления заказа и после каждой успешной смены статуса.
+
 Параметры запроса:
 - `order_id` (path, обязательный)
 
@@ -287,6 +308,8 @@ URL: `/orders/{order_id}/notifications`
 URL: `/orders/{order_id}`
 
 Назначение: обновление параметров существующего заказа.
+
+Допускается изменение `store_id`, `fulfillment` и `total_amount`. После успешного обновления поле `updated_at` должно содержать новое время изменения.
 
 Параметры запроса:
 - `order_id` (path, обязательный)
@@ -354,20 +377,101 @@ URL: `/orders/{order_id}`
 - Сводный прогон HTTP-сценариев: `docs/postman/run_results.json`, `docs/postman/run_results.md`
 - Скриншоты Postman: `docs/img/postman/`
 
-### Скриншоты выполненных запросов
+### Что проверено
+- коллекция Postman покрывает базовый CRUD-сценарий и ключевые ошибки API;
+- автотесты `src/tests/test_api.py` дополнительно проверяют валидацию отрицательной суммы и недопустимого `fulfillment`;
+- доступность сервиса;
+- создание и получение клиента;
+- защита от дублирования клиента;
+- создание заказа и запрет создания заказа для неизвестного клиента;
+- фильтрация и получение заказов;
+- обновление параметров заказа;
+- смена статуса с проверкой допустимых переходов;
+- формирование и чтение уведомлений;
+- удаление заказа и корректная обработка повторного удаления;
+- ошибки валидации для отрицательной суммы и недопустимого `fulfillment`.
 
-| # | Запрос | Скриншот |
-|---|---|---|
-| 1 | `GET /health` | ![01](img/postman/01_health_ok.png) |
-| 2 | `POST /customers` | ![02](img/postman/02_create_customer_ok.png) |
-| 3 | `GET /customers/{id}` | ![03](img/postman/03_get_customer_ok.png) |
-| 4 | `POST /orders` | ![04](img/postman/04_create_order_ok.png) |
-| 5 | `GET /orders` | ![05](img/postman/05_list_orders_ok.png) |
-| 6 | `GET /orders/{id}` | ![06](img/postman/06_get_order_ok.png) |
-| 7 | `PUT /orders/{id}` | ![07](img/postman/07_put_order_ok.png) |
-| 8 | `POST /orders/{id}/status` | ![08](img/postman/08_change_status_ok.png) |
-| 9 | `GET /orders/{id}/notifications` | ![09](img/postman/09_get_notifications_ok.png) |
-| 10 | `DELETE /orders/{id}` | ![10](img/postman/10_delete_order_ok.png) |
+### Артефакты Postman
+
+#### 1. `GET /health`
+
+<p>
+  <img src="img/postman/01_health_request.png" alt="01 health request" width="32%">
+  <img src="img/postman/01_health_response.png" alt="01 health response" width="32%">
+  <img src="img/postman/01_health_tests.png" alt="01 health tests" width="32%">
+</p>
+
+#### 2. `POST /customers`
+
+<p>
+  <img src="img/postman/02_create_customer_request.png" alt="02 create customer request" width="32%">
+  <img src="img/postman/02_create_customer_response.png" alt="02 create customer response" width="32%">
+  <img src="img/postman/02_create_customer_tests.png" alt="02 create customer tests" width="32%">
+</p>
+
+#### 3. `GET /customers/{id}`
+
+<p>
+  <img src="img/postman/03_get_customer_request.png" alt="03 get customer request" width="32%">
+  <img src="img/postman/03_get_customer_response.png" alt="03 get customer response" width="32%">
+  <img src="img/postman/03_get_customer_tests.png" alt="03 get customer tests" width="32%">
+</p>
+
+#### 4. `POST /orders`
+
+<p>
+  <img src="img/postman/04_create_order_request.png" alt="04 create order request" width="32%">
+  <img src="img/postman/04_create_order_response.png" alt="04 create order response" width="32%">
+  <img src="img/postman/04_create_order_tests.png" alt="04 create order tests" width="32%">
+</p>
+
+#### 5. `GET /orders`
+
+<p>
+  <img src="img/postman/05_list_orders_request.png" alt="05 list orders request" width="32%">
+  <img src="img/postman/05_list_orders_response.png" alt="05 list orders response" width="32%">
+  <img src="img/postman/05_list_orders_tests.png" alt="05 list orders tests" width="32%">
+</p>
+
+#### 6. `GET /orders/{id}`
+
+<p>
+  <img src="img/postman/06_get_order_request.png" alt="06 get order request" width="32%">
+  <img src="img/postman/06_get_order_response.png" alt="06 get order response" width="32%">
+  <img src="img/postman/06_get_order_tests.png" alt="06 get order tests" width="32%">
+</p>
+
+#### 7. `POST /orders/{id}/status`
+
+<p>
+  <img src="img/postman/07_change_status_request.png" alt="07 change status request" width="32%">
+  <img src="img/postman/07_change_status_response.png" alt="07 change status response" width="32%">
+  <img src="img/postman/07_change_status_tests.png" alt="07 change status tests" width="32%">
+</p>
+
+#### 8. `GET /orders/{id}/notifications`
+
+<p>
+  <img src="img/postman/08_get_notifications_request.png" alt="08 get notifications request" width="32%">
+  <img src="img/postman/08_get_notifications_response.png" alt="08 get notifications response" width="32%">
+  <img src="img/postman/08_get_notifications_tests.png" alt="08 get notifications tests" width="32%">
+</p>
+
+#### 9. `PUT /orders/{id}`
+
+<p>
+  <img src="img/postman/09_update_order_request.png" alt="09 update order request" width="32%">
+  <img src="img/postman/09_update_order_response.png" alt="09 update order response" width="32%">
+  <img src="img/postman/09_update_order_tests.png" alt="09 update order tests" width="32%">
+</p>
+
+#### 10. `DELETE /orders/{id}`
+
+<p>
+  <img src="img/postman/10_delete_order_request.png" alt="10 delete order request" width="32%">
+  <img src="img/postman/10_delete_order_response.png" alt="10 delete order response" width="32%">
+  <img src="img/postman/10_delete_order_tests.png" alt="10 delete order tests" width="32%">
+</p>
 
 ### Код автотестов в Postman
 

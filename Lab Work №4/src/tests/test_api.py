@@ -72,9 +72,11 @@ class RestApiTests(unittest.TestCase):
             },
         )
         self.assertEqual(order["status"], "placed")
+        created_updated_at = order["updated_at"]
 
         updated = self._put("/api/v1/orders/o-1", {"total_amount": 400})
         self.assertEqual(updated["total_amount"], 400)
+        self.assertNotEqual(updated["updated_at"], created_updated_at)
 
         transitioned = self._post("/api/v1/orders/o-1/status", {"status": "in_preparation"})
         self.assertEqual(transitioned["status"], "in_preparation")
@@ -132,6 +134,55 @@ class RestApiTests(unittest.TestCase):
                     "total_amount": 100,
                 },
             )
+        self.assertEqual(exc.exception.code, 400)
+        exc.exception.close()
+
+    def test_create_order_negative_amount(self) -> None:
+        self._post(
+            "/api/v1/customers",
+            {
+                "customer_id": "c-neg",
+                "name": "Negative",
+            },
+        )
+
+        with self.assertRaises(HTTPError) as exc:
+            self._post(
+                "/api/v1/orders",
+                {
+                    "order_id": "o-neg",
+                    "customer_id": "c-neg",
+                    "store_id": "store-1",
+                    "fulfillment": "pickup",
+                    "total_amount": -1,
+                },
+            )
+
+        self.assertEqual(exc.exception.code, 400)
+        exc.exception.close()
+
+    def test_update_order_invalid_fulfillment(self) -> None:
+        self._post(
+            "/api/v1/customers",
+            {
+                "customer_id": "c-ful",
+                "name": "Fulfillment",
+            },
+        )
+        self._post(
+            "/api/v1/orders",
+            {
+                "order_id": "o-ful",
+                "customer_id": "c-ful",
+                "store_id": "store-1",
+                "fulfillment": "pickup",
+                "total_amount": 100,
+            },
+        )
+
+        with self.assertRaises(HTTPError) as exc:
+            self._put("/api/v1/orders/o-ful", {"fulfillment": "drone"})
+
         self.assertEqual(exc.exception.code, 400)
         exc.exception.close()
 

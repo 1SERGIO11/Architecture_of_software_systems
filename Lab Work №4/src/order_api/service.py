@@ -55,13 +55,13 @@ class OrderApiService:
         self._notifications = notifications
 
     def create_customer(self, payload: dict[str, object]) -> Customer:
-        customer_id = str(payload["customer_id"])
+        customer_id = _require_non_empty_str(payload["customer_id"], "customer_id")
         if self._customers.get(customer_id):
             raise ConflictError(f"Клиент {customer_id} уже существует.")
 
         customer = Customer(
             customer_id=customer_id,
-            name=str(payload["name"]),
+            name=_require_non_empty_str(payload["name"], "name"),
             email=_to_optional_str(payload.get("email")),
             push_token=_to_optional_str(payload.get("push_token")),
             preference=NotificationPreference(
@@ -85,11 +85,13 @@ class OrderApiService:
         customer = self._customers.get(payload.customer_id)
         if not customer:
             raise ValidationError(f"Нельзя создать заказ: клиент {payload.customer_id} не найден.")
+        if payload.total_amount < 0:
+            raise ValidationError("Сумма заказа не может быть отрицательной.")
 
         order = Order(
-            order_id=payload.order_id,
-            customer_id=payload.customer_id,
-            store_id=payload.store_id,
+            order_id=_require_non_empty_str(payload.order_id, "order_id"),
+            customer_id=_require_non_empty_str(payload.customer_id, "customer_id"),
+            store_id=_require_non_empty_str(payload.store_id, "store_id"),
             fulfillment=payload.fulfillment,
             total_amount=payload.total_amount,
         )
@@ -100,7 +102,7 @@ class OrderApiService:
     def list_orders(self, status: str | None = None, customer_id: str | None = None) -> list[Order]:
         items = self._orders.list()
         if status:
-            status_enum = OrderStatus(status)
+            status_enum = _parse_status(status)
             items = [item for item in items if item.status == status_enum]
         if customer_id:
             items = [item for item in items if item.customer_id == customer_id]
@@ -114,23 +116,30 @@ class OrderApiService:
 
     def update_order(self, order_id: str, payload: dict[str, object]) -> Order:
         order = self.get_order(order_id)
+        changed = False
 
         if "store_id" in payload:
-            order.store_id = str(payload["store_id"])
+            order.store_id = _require_non_empty_str(payload["store_id"], "store_id")
+            changed = True
         if "fulfillment" in payload:
-            order.fulfillment = FulfillmentType(str(payload["fulfillment"]))
+            order.fulfillment = _parse_fulfillment(payload["fulfillment"])
+            changed = True
         if "total_amount" in payload:
             amount = float(payload["total_amount"])
             if amount < 0:
                 raise ValidationError("Сумма заказа не может быть отрицательной.")
             order.total_amount = amount
+            changed = True
+
+        if changed:
+            order.touch()
 
         self._orders.save(order)
         return order
 
     def change_order_status(self, order_id: str, status: str) -> Order:
         order = self.get_order(order_id)
-        new_status = OrderStatus(status)
+        new_status = _parse_status(status)
 
         allowed = ALLOWED_TRANSITIONS[order.fulfillment][order.status]
         if new_status not in allowed:
@@ -194,6 +203,31 @@ def _to_optional_str(value: object) -> str | None:
         return None
     text = str(value).strip()
     return text or None
+
+
+def _require_non_empty_str(value: object, field_name: str) -> str:
+    text = str(value).strip()
+    if not text:
+        raise ValidationError(f"Поле {field_name} обязательно и не должно быть пустым.")
+    return text
+
+
+def _parse_status(value: str) -> OrderStatus:
+    try:
+        return OrderStatus(value)
+    except ValueError as exc:
+        raise ValidationError(
+            "Поле status должно быть одним из значений: "
+            "placed, in_preparation, ready_for_pickup, out_for_delivery, delivered, cancelled."
+        ) from exc
+
+
+def _parse_fulfillment(value: object) -> FulfillmentType:
+    text = _require_non_empty_str(value, "fulfillment")
+    try:
+        return FulfillmentType(text)
+    except ValueError as exc:
+        raise ValidationError("Поле fulfillment должно быть pickup или delivery.") from exc
 
 
 def _to_bool(value: object) -> bool:

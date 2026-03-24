@@ -1,6 +1,6 @@
 # Результаты прогонов HTTP-сценариев
 
-Базовый URL: `http://127.0.0.1:50477`
+Базовый URL: `http://127.0.0.1:64185`
 
 ## Шаг 1: GET /api/v1/health
 
@@ -115,7 +115,7 @@ null
     "placed"
   ],
   "total_amount": 320.0,
-  "updated_at": "2026-03-10T15:30:28.380218+00:00"
+  "updated_at": "2026-03-17T14:16:32.758961+00:00"
 }
 ```
 
@@ -139,7 +139,27 @@ null
 }
 ```
 
-## Шаг 8: GET /api/v1/orders
+## Шаг 8: POST /api/v1/orders
+
+Запрос:
+```json
+{
+  "order_id": "demo-o3",
+  "customer_id": "demo-c1",
+  "store_id": "store-1",
+  "fulfillment": "pickup",
+  "total_amount": -5
+}
+```
+
+Ответ: HTTP 400
+```json
+{
+  "error": "Сумма заказа не может быть отрицательной."
+}
+```
+
+## Шаг 9: GET /api/v1/orders
 
 Запрос:
 ```json
@@ -160,13 +180,13 @@ null
         "placed"
       ],
       "total_amount": 320.0,
-      "updated_at": "2026-03-10T15:30:28.380218+00:00"
+      "updated_at": "2026-03-17T14:16:32.758961+00:00"
     }
   ]
 }
 ```
 
-## Шаг 9: GET /api/v1/orders/demo-o1
+## Шаг 10: GET /api/v1/orders/demo-o1
 
 Запрос:
 ```json
@@ -185,11 +205,11 @@ null
     "placed"
   ],
   "total_amount": 320.0,
-  "updated_at": "2026-03-10T15:30:28.380218+00:00"
+  "updated_at": "2026-03-17T14:16:32.758961+00:00"
 }
 ```
 
-## Шаг 10: PUT /api/v1/orders/demo-o1
+## Шаг 11: PUT /api/v1/orders/demo-o1
 
 Запрос:
 ```json
@@ -210,11 +230,27 @@ null
     "placed"
   ],
   "total_amount": 410.0,
-  "updated_at": "2026-03-10T15:30:28.380218+00:00"
+  "updated_at": "2026-03-17T14:16:32.760744+00:00"
 }
 ```
 
-## Шаг 11: POST /api/v1/orders/demo-o1/status
+## Шаг 12: PUT /api/v1/orders/demo-o1
+
+Запрос:
+```json
+{
+  "fulfillment": "drone"
+}
+```
+
+Ответ: HTTP 400
+```json
+{
+  "error": "Поле fulfillment должно быть pickup или delivery."
+}
+```
+
+## Шаг 13: POST /api/v1/orders/demo-o1/status
 
 Запрос:
 ```json
@@ -236,11 +272,11 @@ null
     "in_preparation"
   ],
   "total_amount": 410.0,
-  "updated_at": "2026-03-10T15:30:28.381612+00:00"
+  "updated_at": "2026-03-17T14:16:32.761490+00:00"
 }
 ```
 
-## Шаг 12: POST /api/v1/orders/demo-o1/status
+## Шаг 14: POST /api/v1/orders/demo-o1/status
 
 Запрос:
 ```json
@@ -256,7 +292,7 @@ null
 }
 ```
 
-## Шаг 13: GET /api/v1/orders/demo-o1/notifications
+## Шаг 15: GET /api/v1/orders/demo-o1/notifications
 
 Запрос:
 ```json
@@ -268,42 +304,42 @@ null
 {
   "items": [
     {
-      "notification_id": "4c21bc41-82f8-49a2-bf3d-ca59136592b3",
+      "notification_id": "00fa8dd1-1984-4364-8234-2e1cbb5f4795",
       "order_id": "demo-o1",
       "channel": "push",
       "recipient": "push-demo",
       "message": "Заказ принят: заказ #demo-o1, статус placed.",
-      "created_at": "2026-03-10T15:30:28.380255+00:00"
+      "created_at": "2026-03-17T14:16:32.758986+00:00"
     },
     {
-      "notification_id": "5b80bc37-5d45-4432-b316-9a4adb588fa8",
+      "notification_id": "2465e2bb-20c2-49e9-8e9a-a537bfec800d",
       "order_id": "demo-o1",
       "channel": "email",
       "recipient": "demo@example.com",
       "message": "Заказ принят: заказ #demo-o1, статус placed.",
-      "created_at": "2026-03-10T15:30:28.380265+00:00"
+      "created_at": "2026-03-17T14:16:32.758994+00:00"
     },
     {
-      "notification_id": "194737ca-1b0a-4bbb-89d3-b87bc16fb9e7",
+      "notification_id": "4340d0b2-9915-4a24-8872-7f3827f8b012",
       "order_id": "demo-o1",
       "channel": "push",
       "recipient": "push-demo",
       "message": "Заказ готовится: заказ #demo-o1, статус in_preparation.",
-      "created_at": "2026-03-10T15:30:28.381627+00:00"
+      "created_at": "2026-03-17T14:16:32.761510+00:00"
     },
     {
-      "notification_id": "fa459ffe-c159-4719-a728-87cffc0c6328",
+      "notification_id": "d9e2a1dd-1970-46cb-aab4-13cb79ae6755",
       "order_id": "demo-o1",
       "channel": "email",
       "recipient": "demo@example.com",
       "message": "Заказ готовится: заказ #demo-o1, статус in_preparation.",
-      "created_at": "2026-03-10T15:30:28.381631+00:00"
+      "created_at": "2026-03-17T14:16:32.761516+00:00"
     }
   ]
 }
 ```
 
-## Шаг 14: DELETE /api/v1/orders/demo-o1
+## Шаг 16: DELETE /api/v1/orders/demo-o1
 
 Запрос:
 ```json
@@ -315,7 +351,7 @@ null
 null
 ```
 
-## Шаг 15: DELETE /api/v1/orders/demo-o1
+## Шаг 17: DELETE /api/v1/orders/demo-o1
 
 Запрос:
 ```json

@@ -1,9 +1,9 @@
-# Скриншоты Postman
+# Артефакты Postman
 
-В этой папке должны размещаться скриншоты для отчета ЛР4:
-- запрос (Params / Authorization / Headers / Body);
-- ответ (Body / Headers);
-- Test Results.
+В папке размещены артефакты для отчета ЛР4:
+- `request` для окна запроса;
+- `response` для ответа сервера;
+- `tests` для результатов автотестов коллекции.
 
 Рекомендуемые имена файлов:
 - `01_health_request.png`, `01_health_response.png`, `01_health_tests.png`
