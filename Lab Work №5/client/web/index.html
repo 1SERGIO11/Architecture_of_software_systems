@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sandwich Control Center</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="page-bg"></div>
+    <main class="layout">
+      <header class="hero">
+        <p class="eyebrow">LAB WORK #5</p>
+        <h1>Sandwich App Client UI</h1>
+        <p>
+          Веб-клиент для управления заказами, смены статусов и просмотра уведомлений в реальном
+          времени.
+        </p>
+        <div class="actions">
+          <button id="checkHealthBtn" class="btn btn-accent">Проверить API</button>
+          <button id="refreshCustomersBtn" class="btn btn-ghost">Обновить список клиентов</button>
+          <button id="refreshOrdersBtn" class="btn btn-ghost">Обновить список заказов</button>
+        </div>
+        <div id="healthBadge" class="health health-pending">API: не проверено</div>
+      </header>
+
+      <section class="stats-grid">
+        <article class="stat-card">
+          <span>Клиенты</span>
+          <strong id="statsCustomers">0</strong>
+          <small>доступно в системе</small>
+        </article>
+        <article class="stat-card">
+          <span>Заказы</span>
+          <strong id="statsOrders">0</strong>
+          <small>после текущего фильтра</small>
+        </article>
+        <article class="stat-card">
+          <span>Выбранный клиент</span>
+          <strong id="statsSelectedCustomer">-</strong>
+          <small>для создания заказа</small>
+        </article>
+        <article class="stat-card">
+          <span>Выбранный заказ</span>
+          <strong id="statsSelectedOrder">-</strong>
+          <small>для изменения и удаления</small>
+        </article>
+        <article class="stat-card">
+          <span>Уведомления</span>
+          <strong id="statsNotifications">0</strong>
+          <small>по активному заказу</small>
+        </article>
+      </section>
+
+      <section class="panel panel-create">
+        <h2>Создание клиента</h2>
+        <form id="customerForm" class="grid-2">
+          <label>
+            Идентификатор клиента
+            <input name="customer_id" placeholder="клиент-501" required />
+          </label>
+          <label>
+            Имя клиента
+            <input name="name" placeholder="Иван Петров" required />
+          </label>
+          <label>
+            Электронная почта
+            <input name="email" placeholder="ivan@example.com" />
+          </label>
+          <label>
+            Токен push-уведомлений
+            <input name="push_token" placeholder="push-501" />
+          </label>
+          <label class="toggle">
+            <input type="checkbox" name="push_enabled" checked />
+            Push уведомления включены
+          </label>
+          <label class="toggle">
+            <input type="checkbox" name="email_enabled" checked />
+            Email уведомления включены
+          </label>
+          <button class="btn btn-accent" type="submit">Создать клиента</button>
+        </form>
+      </section>
+
+      <section class="panel panel-create">
+        <h2>Создание заказа</h2>
+        <p class="hint">Идентификатор клиента можно подставить кликом по строке в таблице клиентов.</p>
+        <form id="orderForm" class="grid-2">
+          <label>
+            Идентификатор заказа
+            <input name="order_id" placeholder="заказ-900" required />
+          </label>
+          <label>
+            Идентификатор клиента
+            <input name="customer_id" placeholder="клиент-501" required />
+          </label>
+          <label>
+            Идентификатор магазина
+            <input name="store_id" placeholder="store-1" required />
+          </label>
+          <label>
+            Тип получения
+            <select name="fulfillment">
+              <option value="pickup">Самовывоз</option>
+              <option value="delivery">Доставка</option>
+            </select>
+          </label>
+          <label>
+            Сумма
+            <input type="number" step="0.01" min="0" name="total_amount" value="350" required />
+          </label>
+          <button class="btn btn-accent" type="submit">Создать заказ</button>
+        </form>
+      </section>
+
+      <section class="panel panel-table">
+        <div class="panel-head">
+          <h2>Клиенты</h2>
+          <div class="inline-filters">
+            <input id="customerSearchFilter" placeholder="Поиск по ID или имени" />
+            <button id="applyCustomerFilterBtn" class="btn btn-ghost">Применить</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Идентификатор</th>
+                <th>Имя</th>
+                <th>Электронная почта</th>
+                <th>Push</th>
+                <th>Email</th>
+              </tr>
+            </thead>
+            <tbody id="customersBody"></tbody>
+          </table>
+        </div>
+        <p class="hint">Нажми на клиента, чтобы выбрать его для формы создания заказа.</p>
+      </section>
+
+      <section class="panel panel-table">
+        <div class="panel-head">
+          <h2>Заказы</h2>
+          <div class="inline-filters">
+            <select id="statusFilter">
+              <option value="">Все статусы</option>
+              <option value="placed">Принят</option>
+              <option value="in_preparation">Готовится</option>
+              <option value="ready_for_pickup">Готов к выдаче</option>
+              <option value="out_for_delivery">Передан курьеру</option>
+              <option value="delivered">Завершен</option>
+              <option value="cancelled">Отменен</option>
+            </select>
+            <input id="customerFilter" placeholder="Фильтр: идентификатор клиента" />
+            <button id="applyFilterBtn" class="btn btn-ghost">Применить</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Идентификатор заказа</th>
+                <th>Клиент</th>
+                <th>Магазин</th>
+                <th>Статус</th>
+                <th>Тип получения</th>
+                <th>Сумма</th>
+                <th>Обновлен</th>
+              </tr>
+            </thead>
+            <tbody id="ordersBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel panel-details">
+        <h2>Работа с заказом</h2>
+        <div id="orderHint" class="hint">Выбери заказ в таблице, чтобы изменить или удалить его.</div>
+        <div id="detailsContent" class="details hidden">
+          <p class="mono">Текущий заказ: <span id="selectedOrderId">-</span></p>
+
+          <div class="facts-grid">
+            <article class="fact-card">
+              <span>Статус</span>
+              <strong id="detailStatus">-</strong>
+            </article>
+            <article class="fact-card">
+              <span>Тип получения</span>
+              <strong id="detailFulfillment">-</strong>
+            </article>
+            <article class="fact-card">
+              <span>Сумма</span>
+              <strong id="detailAmount">-</strong>
+            </article>
+            <article class="fact-card">
+              <span>Обновлен</span>
+              <strong id="detailUpdated">-</strong>
+            </article>
+          </div>
+
+          <form id="updateOrderForm" class="grid-2">
+            <label>
+              Новый идентификатор магазина
+              <input name="store_id" placeholder="store-2" />
+            </label>
+            <label>
+              Новый тип получения
+              <select name="fulfillment">
+                <option value="">(без изменений)</option>
+                <option value="pickup">Самовывоз</option>
+                <option value="delivery">Доставка</option>
+              </select>
+            </label>
+            <label>
+              Новая сумма
+              <input type="number" step="0.01" min="0" name="total_amount" />
+            </label>
+            <button class="btn btn-accent" type="submit">Обновить заказ (PUT)</button>
+          </form>
+
+          <form id="statusForm" class="inline-status">
+            <select name="status">
+              <option value="in_preparation">Готовится</option>
+              <option value="ready_for_pickup">Готов к выдаче</option>
+              <option value="out_for_delivery">Передан курьеру</option>
+              <option value="delivered">Завершен</option>
+              <option value="cancelled">Отменен</option>
+            </select>
+            <button class="btn btn-accent" type="submit">Сменить статус</button>
+            <button id="loadNotificationsBtn" class="btn btn-ghost" type="button">
+              Показать уведомления
+            </button>
+            <button id="deleteOrderBtn" class="btn btn-danger" type="button">
+              Удалить заказ
+            </button>
+          </form>
+
+          <div id="orderTimeline" class="timeline"></div>
+          <div id="notificationsBox" class="notifications"></div>
+        </div>
+      </section>
+
+      <section class="panel panel-log">
+        <h2>Системный журнал</h2>
+        <pre id="logBox"></pre>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
